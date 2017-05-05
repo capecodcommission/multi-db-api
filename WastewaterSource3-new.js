@@ -38,7 +38,7 @@ var wMVP3_CapeCodMAConfig = {
 };
 
 // Estbalish a WastewaterSource3Query f(x) to connect to 'wMVP3_CapeCodMA' & get a response
-var  WastewaterSource3Query = function(res, query) {
+var  WastewaterSource3Query = function (res, query) {
 
   // use mssql node package to connect to the 'wMVP3_CapeCodMA' db
   sql.connect(wMVP3_CapeCodMAConfig, function (err) {
@@ -51,11 +51,14 @@ var  WastewaterSource3Query = function(res, query) {
 
     // if there's no error, create the Request object & query the db
     else {
+
+      // indicate connection to the 'wMVP3_CapeCodMA' database
+      console.log('we are connected');
       // create Request object
       var request = new sql.Request();
 
       // query the database
-      request.query(query, function (err, res) {
+      request.query(query, function (err, recordset) {
 
         // if there's an error in the query, console.log it out
         if (err) {
@@ -65,7 +68,7 @@ var  WastewaterSource3Query = function(res, query) {
 
         // if there's no error, send the response
         else {
-          res.send(res);
+          res.send(recordset);
         }
       });
     }
@@ -73,8 +76,9 @@ var  WastewaterSource3Query = function(res, query) {
 };
 
 //GET API
-app.get('/api/Wastewater', function(req , res) {
-  var query = 'select * from WastewaterSource3';
+app.get('/api/WastewaterSource3', function(req , res) {
+  var query = 'select top 1000 * from WastewaterSource3';
+  // WastewaterSource3Query ();
   WastewaterSource3Query (res, query);
 });
 
