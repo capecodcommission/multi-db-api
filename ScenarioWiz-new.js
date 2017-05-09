@@ -17,7 +17,7 @@ app.use(function (req, res, next) {
 });
 
 // set the server & port config as vars
-var server = app.listen(process.env.PORT || 8080, function () {
+var server = app.listen(process.env.PORT || 8081, function () {
   var port = server.address().port;
   console.log('App now running on port', port);
 });
@@ -38,8 +38,8 @@ var wMVP3_CapeCodMAConfig = {
   }
 };
 
-// Estbalish a WastewaterSource3Query f(x) to connect to 'wMVP3_CapeCodMA' & get a response
-var  WastewaterSource3Query = function (res, query) {
+// Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
+var  ScenarioWizQuery = function (res, query) {
 
   // use mssql node package to connect to the 'wMVP3_CapeCodMA' db
   sql.connect(wMVP3_CapeCodMAConfig, function (err) {
@@ -105,9 +105,9 @@ var  WastewaterSource3Query = function (res, query) {
 };
 
 //GET API
-app.get('/api/WastewaterSource3', function(req , res) {
-  var query = 'select top 17500 * from WastewaterSource3';
-  WastewaterSource3Query (res, query);
+app.get('/api/ScenarioWiz', function(req , res) {
+  var query = 'select * from CapeCodMA.Scenario_Wiz';
+  ScenarioWizQuery (res, query);
 });
 
 //POST API
