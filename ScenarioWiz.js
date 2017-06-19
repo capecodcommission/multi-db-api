@@ -59,6 +59,7 @@ var wqm_DBConfig = {
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
 var  executeQuery = function (res, query, config) {
 
+  // Must close open sql connection first before opening a new one
   sql.close()
 
   // use mssql node package to connect to the 'wMVP3_CapeCodMA' db
