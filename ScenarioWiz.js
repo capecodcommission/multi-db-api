@@ -41,8 +41,25 @@ var wmvp3_DBConfig = {
   }
 };
 
+var wqm_DBConfig = {
+  user: 'DBAccess',
+  password: 'Acce$$DB',
+  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
+  server: '10.10.1.174',
+  port: '65335',
+  database: 'WaterQualityMonitoring',
+  stream: true,
+  pool: {
+    max: 100,
+    min: 0,
+    idleTimeoutMillis: 300000
+  }
+};
+
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
 var  executeQuery = function (res, query, config) {
+
+  sql.close()
 
   // use mssql node package to connect to the 'wMVP3_CapeCodMA' db
   sql.connect(config, function (err) {
@@ -146,6 +163,21 @@ app.get('/api/parcelMaster/:id', function(req , res) {
 
   executeQuery (res, query, wmvp3_DBConfig);
 });
+
+
+
+// GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
+app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
+
+  var query = 'select * from dbo.StgEmbaymentWaterQualityData WHERE EMBAYMENT_ID = ' + req.params.id;
+
+  executeQuery (res, query, wqm_DBConfig);
+});
+
+
+
+
+
 
 //POST API
 //  app.post("/api/user ", function(req , res){
