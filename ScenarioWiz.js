@@ -157,6 +157,7 @@ app.get('/api/Subwatersheds', function(req , res) {
 });
 
 // GET parcelMaster from wmvp3
+// EXAMPLE: scenarioid: /api/parcelMaster/2586
 app.get('/api/parcelMaster/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.parcelMaster WHERE scenario_id = ' + req.params.id;
@@ -167,6 +168,7 @@ app.get('/api/parcelMaster/:id', function(req , res) {
 
 
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
+// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101     
 app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
 
   var query = 'select * from dbo.StgEmbaymentWaterQualityData WHERE EMBAYMENT_ID = ' + req.params.id;
