@@ -191,6 +191,25 @@ app.get('/api/wiz_treatment_towns/:id', function(req , res) {
 });
 
 
+// GET WastewaterSource3 from wmvp3
+// EXAMPLE: scenarioid: /api/WastewaterSource3/242
+app.get('/api/WastewaterSource3/:id', function(req , res) {
+
+  var query = 'select * from dbo.WastewaterSource3 WHERE Muni_ID = ' + req.params.id;
+
+  executeQuery (res, query, wmvp3_DBConfig);
+});
+
+// GET ParcelCharacteristics from wmvp3
+// EXAMPLE: scenarioid: /api/ParcelCharacteristics/242
+app.get('/api/ParcelCharacteristics/:id', function(req , res) {
+
+  var query = 'select * from dbo.ParcelCharacteristics WHERE Muni_ID = ' + req.params.id;
+
+  executeQuery (res, query, wmvp3_DBConfig);
+});
+
+
 
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
 // EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101     
