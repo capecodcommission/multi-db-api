@@ -56,6 +56,21 @@ var wqm_DBConfig = {
   }
 };
 
+var tm_DBConfig = {
+  user: 'DBAccess',
+  password: 'Acce$$DB',
+  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
+  server: '10.10.1.174',
+  port: '65335',
+  database: 'Tech_Matrix',
+  stream: true,
+  pool: {
+    max: 100,
+    min: 0,
+    idleTimeoutMillis: 300000
+  }
+};
+
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
 var  executeQuery = function (res, query, config) {
 
@@ -102,17 +117,17 @@ var  executeQuery = function (res, query, config) {
 }
 
 //GET ScenarioWiz table from wmvp3 DB
-app.get('/api/ScenarioWiz', function(req , res) {
+app.get('/api/ScenarioWiz/:id', function(req , res) {
 
-  var query = 'select * from CapeCodMA.Scenario_Wiz';
+  var query = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + req.params.id;
 
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
 //GET TreatmentWiz table from wmvp3 DB
-app.get('/api/TreatmentWiz', function(req , res) {
+app.get('/api/TreatmentWiz/:id', function(req , res) {
 
-  var query = 'select * from CapeCodMA.Treatment_Wiz';
+  var query = 'select * from CapeCodMA.Treatment_Wiz where ScenarioID = ' + req.params.id;
 
   executeQuery (res, query, wmvp3_DBConfig);
 });
@@ -166,6 +181,15 @@ app.get('/api/parcelMaster/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
+// GET wiz_treatment_towns from wmvp3
+// EXAMPLE: scenarioid: /api/wiz_treatment_towns/2586
+app.get('/api/wiz_treatment_towns/:id', function(req , res) {
+
+  var query = 'select * from CapeCodMA.wiz_treatment_towns WHERE wtt_scenario_id = ' + req.params.id;
+
+  executeQuery (res, query, wmvp3_DBConfig);
+});
+
 
 
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
@@ -178,7 +202,14 @@ app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
 });
 
 
+// GET Technology_Matrix from Tech_Matrix
+// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11    
+app.get('/api/Technology_Matrix/:id', function(req , res) {
 
+  var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
+
+  executeQuery (res, query, tm_DBConfig);
+});
 
 
 
