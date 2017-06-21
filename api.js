@@ -185,7 +185,7 @@ app.get('/api/parcelMaster/:id', function(req , res) {
 // EXAMPLE: scenarioid: /api/wiz_treatment_towns/2586
 app.get('/api/wiz_treatment_towns/:id', function(req , res) {
 
-  var query = 'select * from CapeCodMA.wiz_treatment_towns WHERE wtt_scenario_id = ' + req.params.id;
+  var query = 'select * from dbo.wiz_treatment_towns WHERE wtt_scenario_id = ' + req.params.id;
 
   executeQuery (res, query, wmvp3_DBConfig);
 });
