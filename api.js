@@ -18,9 +18,7 @@ app.use(function (req, res, next) {
 });
 
 // set the server & port config as vars
-// 8081 for development | 80 for production
-// var server = app.listen(process.env.PORT || 8081, function () {
-  var server = app.listen(process.env.PORT || 80, function () {
+var server = app.listen(process.env.PORT || 8081, function () {
 
   var port = server.address().port;
 
