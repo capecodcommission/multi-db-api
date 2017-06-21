@@ -18,7 +18,9 @@ app.use(function (req, res, next) {
 });
 
 // set the server & port config as vars
-var server = app.listen(process.env.PORT || 8081, function () {
+// 8081 for development | 80 for production
+// var server = app.listen(process.env.PORT || 8081, function () {
+  var server = app.listen(process.env.PORT || 80, function () {
 
   var port = server.address().port;
 
@@ -212,7 +214,7 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
 
 
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
-// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101     
+// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
 app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
 
   var query = 'select * from dbo.StgEmbaymentWaterQualityData WHERE EMBAYMENT_ID = ' + req.params.id;
@@ -222,7 +224,7 @@ app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
 
 
 // GET Technology_Matrix from Tech_Matrix
-// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11    
+// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11
 app.get('/api/Technology_Matrix/:id', function(req , res) {
 
   var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
