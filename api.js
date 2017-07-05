@@ -209,30 +209,38 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-
-
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
 // EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
-app.get('/api/getEmbayment/:id', function(req , res) {
+app.get("/api/getEmbayment/:name", function(req , res) {
 
-  var query = `select
-                Date as DATE,
-                case when SalFin is null then SalinityPpt else null end as SAL_FIN,
-                case when DoMgFin is null then CorrectedDoMgPL when CorrectedDoMgPL is null then DoMgPL else null end as DO_MG_FIN,
-                case when TnPpmFin is null then TnUm end as TN_PPM_FIN,
-                WaterTempC as WATER_TEMP_C,
-                PrecFin as PREC_FIN,
-                TotalDepthM as TOTAL_DEPTH_M,
-                NoxUmFin as NOX_UM_FIN,
-                Nh4UmFin as NH4_UM_FIN,
-                Po4Um as PO4_UM,
-                ChlaUgPL as CHLA_UG_P_L,
-                PhaeoUgPL as PHAEO_UG_P_L
-
-               from dbo.WaterQualityReading WHERE StnEquiv = ` + req.params.id + ' order by cast(Date as date)'
+  var query = "SELECT \
+                Date as date, \
+                case when SalFin is null then SalinityPpt else null end as salinity, \
+                case when DoMgFin is null then CorrectedDoMgPL when CorrectedDoMgPL is null then DoMgPL else null end as disolvedoxygen, \
+                case when TnPpmFin is null then TnUm end as nitrogen, \
+                WaterTempC as water_temp, \
+                PrecFin as precipitation, \
+                TotalDepthM as depth, \
+                NoxUmFin as nitrate_nitrite, \
+                Nh4UmFin as ammonium, \
+                Po4Um as orthophosphate, \
+                ChlaUgPL as chlorophyll, \
+                PhaeoUgPL as phaeophytin \
+               FROM dbo.WaterQualityReading \
+               WHERE StnEquiv = " + "'" + req.params.name + "'";
 
   executeQuery (res, query, wqm_DBConfig);
 });
+
+// GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
+// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
+app.get('/api/getEmbayments', function(req , res) {
+
+  var query = 'select distinct EMBAYMENT, EMBAYMENT_ID from dbo.StgEmbaymentWaterQualityData where EMBAYMENT_ID is not null' 
+
+  executeQuery (res, query, wqm_DBConfig);
+});
+
 
 
 // GET Technology_Matrix from Tech_Matrix
