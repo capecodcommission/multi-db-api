@@ -213,9 +213,23 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
 
 // GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
 // EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
-app.get('/api/StgEmbaymentWaterQualityData/:id', function(req , res) {
+app.get('/api/getEmbayment/:id', function(req , res) {
 
-  var query = 'select * from dbo.StgEmbaymentWaterQualityData WHERE EMBAYMENT_ID = ' + req.params.id;
+  var query = `select
+                Date as DATE,
+                case when SalFin is null then SalinityPpt else null end as SAL_FIN,
+                case when DoMgFin is null then CorrectedDoMgPL when CorrectedDoMgPL is null then DoMgPL else null end as DO_MG_FIN,
+                case when TnPpmFin is null then TnUm end as TN_PPM_FIN,
+                WaterTempC as WATER_TEMP_C,
+                PrecFin as PREC_FIN,
+                TotalDepthM as TOTAL_DEPTH_M,
+                NoxUmFin as NOX_UM_FIN,
+                Nh4UmFin as NH4_UM_FIN,
+                Po4Um as PO4_UM,
+                ChlaUgPL as CHLA_UG_P_L,
+                PhaeoUgPL as PHAEO_UG_P_L
+
+               from dbo.WaterQualityReading WHERE StnEquiv = ` + req.params.id + ' order by cast(Date as date)'
 
   executeQuery (res, query, wqm_DBConfig);
 });
