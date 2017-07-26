@@ -236,7 +236,8 @@ app.get("/api/getEmbayment/:name", function(req , res) {
 // EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
 app.get('/api/getEmbayments', function(req , res) {
 
-  var query = 'select distinct EMBAYMENT, EMBAYMENT_ID from dbo.StgEmbaymentWaterQualityData where EMBAYMENT_ID is not null and EMBAYMENT_ID < 161' 
+  var query = "select distinct EMBAYMENT, EMBAYMENT_ID from dbo.StgEmbaymentWaterQualityData where EMBAYMENT_ID is not null" \
+              " and EMBAYMENT_ID < 161 and EMBAYMENT_ID not in (120,127,160,)" 
 
   executeQuery (res, query, wqm_DBConfig);
 });
