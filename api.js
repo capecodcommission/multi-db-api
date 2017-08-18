@@ -258,7 +258,7 @@ app.get('/api/getEmbayments', function(req , res) {
 
 app.get('/api/getNeighborhoods', function(req , res) {
 
-  var query = 'select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''' 
+  var query = "select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''"
 
   executeQuery (res, query, comchar_DBConfig);
 });
