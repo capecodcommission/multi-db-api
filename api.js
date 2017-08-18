@@ -71,6 +71,21 @@ var tm_DBConfig = {
   }
 };
 
+var comchar_DBConfig = {
+  user: 'DBAccess',
+  password: 'Acce$$DB',
+  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
+  server: '10.10.1.174',
+  port: '65335',
+  database: 'CommunityCharacteristics',
+  stream: true,
+  pool: {
+    max: 100,
+    min: 0,
+    idleTimeoutMillis: 300000
+  }
+};
+
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
 var  executeQuery = function (res, query, config) {
 
@@ -236,9 +251,16 @@ app.get("/api/getEmbayment/:name", function(req , res) {
 // EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
 app.get('/api/getEmbayments', function(req , res) {
 
-  var query = 'select id as EMBAYMENT_ID, Name as EMBAYMENT from dbo.Embayment where id is not null and id < 161' 
+  var query = 'select id as EMBAYMENT_ID, Name as EMBAYMENT from dbo.commchar_0815 where id is not null and id < 161' 
 
   executeQuery (res, query, wqm_DBConfig);
+});
+
+app.get('/api/getNeighborhoods', function(req , res) {
+
+  var query = 'select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''' 
+
+  executeQuery (res, query, comchar_DBConfig);
 });
 
 
