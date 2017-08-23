@@ -263,6 +263,13 @@ app.get('/api/getNeighborhoods', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
+app.get('/api/getActivityCenters', function(req , res) {
+
+  var query = "select distinct AC_FINAL as center from dbo.commchar_0815 where AC_FINAL != ''"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
 
 
 // GET Technology_Matrix from Tech_Matrix
