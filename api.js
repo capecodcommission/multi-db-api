@@ -270,7 +270,12 @@ app.get('/api/getActivityCenters', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
+app.get('/api/getTowns', function(req , res) {
 
+  var query = "select distinct Town as town from dbo.commchar_0815 where Town != ''"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
 
 // GET Technology_Matrix from Tech_Matrix
 // EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11
