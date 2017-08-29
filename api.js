@@ -242,7 +242,7 @@ app.get("/api/getEmbayment/:name", function(req , res) {
                 ChlaUgPL as chlorophyll, \
                 PhaeoUgPL as phaeophytin \
                FROM dbo.WaterQualityReading \
-               WHERE StnEquiv = " + "'" + req.params.name + "'" + 'ORDER BY cast(DATE as date)';
+               WHERE Uid = " + "'" + req.params.name + "'" + 'ORDER BY cast(DATE as date)';
 
   executeQuery (res, query, wqm_DBConfig);
 });
