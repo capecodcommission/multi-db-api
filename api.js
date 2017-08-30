@@ -230,7 +230,7 @@ app.get("/api/getEmbayment/:name", function(req , res) {
 
   var query = "SELECT \
                 Date as date, \
-                case when SalFin is null then SalinityPpt else null end as salinity, \
+                case when SalFin is null then CorrectedSalinityPpt when CorrectedSalinityPpt is null then SalinityPpt else null end as salinity, \
                 case when DoMgFin is null then CorrectedDoMgPL when CorrectedDoMgPL is null then DoMgPL else null end as disolvedoxygen, \
                 case when TnPpmFin is null then TnUm end as nitrogen, \
                 WaterTempC as water_temp, \
