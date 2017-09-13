@@ -286,6 +286,23 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
   executeQuery (res, query, tm_DBConfig);
 });
 
+app.get('/api/getACScores', function(req , res) {
+
+  var query = "SELECT \
+                AC_FINAL as Activity_Center \
+                ,SUM(SUM_CAsites) as Community \
+                ,SUM(SUM_BAsites) as Business \
+                ,SUM(PctImp_Above40) as Impervious \
+                ,SUM(CASE \
+                  WHEN FormWeight >= 6 AND \
+                    PctImp_Above40 = 1 THEN 1 \
+                  ELSE 0 \
+                END) as GoodForm \
+              FROM dbo.commchar_0815 \
+              WHERE AC_FINAL != '' \
+              GROUP BY AC_FINAL"
+
+  executeQuery (res, query, comchar_DBConfig);
 
 
 //POST API
