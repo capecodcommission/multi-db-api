@@ -304,6 +304,8 @@ app.get('/api/getACScores', function(req , res) {
 
   executeQuery (res, query, comchar_DBConfig);
 
+});
+
 
 //POST API
 //  app.post("/api/user ", function(req , res){
