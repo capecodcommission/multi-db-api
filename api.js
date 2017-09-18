@@ -292,7 +292,7 @@ app.get('/api/getACScores/:type', function(req , res) {
 
   var query = ""
 
-  if (type = 'ac') {
+  if (type === 'ac') {
 
     query = "SELECT \
                 AC_FINAL as Activity_Center \
@@ -307,7 +307,7 @@ app.get('/api/getACScores/:type', function(req , res) {
               FROM dbo.commchar_0815 \
               WHERE AC_FINAL != '' \
               GROUP BY AC_FINAL"
-  } else if (type = 'nbh') {
+  } else if (type === 'nbh') {
 
     query = "SELECT \
                 Neighborhood as Activity_Center \
@@ -322,7 +322,7 @@ app.get('/api/getACScores/:type', function(req , res) {
               FROM dbo.commchar_0815 \
               WHERE Neighborhood != '' \
               GROUP BY Neighborhood"
-  } else if (type = 'twn') {
+  } else if (type === 'twn') {
 
     query = "SELECT \
                 Town as Activity_Center \
