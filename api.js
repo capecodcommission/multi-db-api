@@ -343,6 +343,61 @@ app.get('/api/getACScores/:type', function(req , res) {
 });
 
 
+app.get('/api/getd3Data/:type/:name', function(req , res) {
+
+  var type =  req.params.type
+  var name = req.params.name
+
+  var query = ""
+
+  if (type === 'ac') {
+
+    query = "SELECT \
+                AC_FINAL as Activity_Center \
+                ,SUM(SUM_CAsites) as Community \
+                ,SUM(SUM_BAsites) as Business \
+                ,SUM(PctImp_Above40) as Impervious \
+                ,SUM(CASE \
+                  WHEN FormWeight >= 6 AND \
+                    PctImp_Above40 = 1 THEN 1 \
+                  ELSE 0 \
+                END) as GoodForm \
+              FROM dbo.commchar_0815 \
+              WHERE AC_FINAL = " + name
+  } else if (type === 'nbh') {
+
+    query = "SELECT \
+                Neighborhood as Activity_Center \
+                ,SUM(SUM_CAsites) as Community \
+                ,SUM(SUM_BAsites) as Business \
+                ,SUM(PctImp_Above40) as Impervious \
+                ,SUM(CASE \
+                  WHEN FormWeight >= 6 AND \
+                    PctImp_Above40 = 1 THEN 1 \
+                  ELSE 0 \
+                END) as GoodForm \
+              FROM dbo.commchar_0815 \
+              WHERE Neighborhood = " + name
+  } else if (type === 'twn') {
+
+    query = "SELECT \
+                Town as Activity_Center \
+                ,SUM(SUM_CAsites) as Community \
+                ,SUM(SUM_BAsites) as Business \
+                ,SUM(PctImp_Above40) as Impervious \
+                ,SUM(CASE \
+                  WHEN FormWeight >= 6 AND \
+                    PctImp_Above40 = 1 THEN 1 \
+                  ELSE 0 \
+                END) as GoodForm \
+              FROM dbo.commchar_0815 \
+              WHERE Town = " + name
+  }
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+
 //POST API
 //  app.post("/api/user ", function(req , res){
 //                 var query = "INSERT INTO [user] (Name,Email,Password) VALUES (req.body.Name,req.body.Email,req.body.Password”);
