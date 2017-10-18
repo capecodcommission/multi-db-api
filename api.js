@@ -363,7 +363,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
                   ELSE 0 \
                 END) as GoodForm \
               FROM dbo.commchar_0815 \
-              WHERE AC_FINAL = " + name
+              WHERE AC_FINAL = " + "'" + name + "'"
   } else if (type === 'nbh') {
 
     query = "SELECT \
@@ -377,7 +377,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
                   ELSE 0 \
                 END) as GoodForm \
               FROM dbo.commchar_0815 \
-              WHERE Neighborhood = " + name
+              WHERE Neighborhood = " + "'" + name + "'"
   } else if (type === 'twn') {
 
     query = "SELECT \
@@ -391,7 +391,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
                   ELSE 0 \
                 END) as GoodForm \
               FROM dbo.commchar_0815 \
-              WHERE Town = " + name
+              WHERE Town = " + "'" + name + "'"
   }
 
   executeQuery (res, query, comchar_DBConfig);
