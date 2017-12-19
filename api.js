@@ -224,9 +224,32 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
-// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
+// GET WaterQualityReading from WaterQualityMonitoring
+// EXAMPLE: WMO36: /api/getEmbayment/WMO36
 app.get("/api/getEmbayment/:name", function(req , res) {
+
+  var query = "SELECT \
+                Date as date, \
+                case WHEN SalFin IS NOT NULL THEN SalFin when  CorrectedSalinityPpt IS NOT NULL THEN CorrectedSalinityPpt WHEN SalinityPpt IS NOT NULL THEN SalinityPpt else null end as salinity, \
+                case when DoMgFin IS NOT NULL THEN DoMgFin when  CorrectedDoMgPL IS NOT NULL THEN CorrectedDoMgPL when DoMgPL is not null then DoMgPL else null end as disolvedoxygen, \
+                case WHEN TnPpmFin IS NOT NULL THEN TnPpmFin when TnUm is NOT NULL then TnUm else null end as nitrogen, \
+                WaterTempC as water_temp, \
+                PrecFin as precipitation, \
+                TotalDepthM as depth, \
+                NoxUmFin as nitrate_nitrite, \
+                Nh4UmFin as ammonium, \
+                Po4Um as orthophosphate, \
+                ChlaUgPL as chlorophyll, \
+                PhaeoUgPL as phaeophytin \
+               FROM dbo.WaterQualityReading \
+               WHERE Uid = " + "'" + req.params.name + "'" + 'ORDER BY cast(DATE as date)';
+
+  executeQuery (res, query, wqm_DBConfig);
+});
+
+// GET WaterQualityReading from WaterQualityMonitoring
+// EXAMPLE: /api/getStation/WMO36
+app.get("/api/getStation/:name", function(req , res) {
 
   var query = "SELECT \
                 Date as date, \
@@ -256,6 +279,7 @@ app.get('/api/getEmbayments', function(req , res) {
   executeQuery (res, query, wqm_DBConfig);
 });
 
+// GET commchar_0815 from CommunityCharacteristics
 app.get('/api/getNeighborhoods', function(req , res) {
 
   var query = "select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''"
@@ -263,6 +287,7 @@ app.get('/api/getNeighborhoods', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
+// GET commchar_0815 from CommunityCharacteristics
 app.get('/api/getActivityCenters', function(req , res) {
 
   var query = "select distinct AC_FINAL as center from dbo.commchar_0815 where AC_FINAL != ''"
@@ -270,6 +295,7 @@ app.get('/api/getActivityCenters', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
+// GET commchar_0815 from CommunityCharacteristics
 app.get('/api/getTowns', function(req , res) {
 
   var query = "select distinct Town as town from dbo.commchar_0815 where Town != ''"
@@ -286,6 +312,8 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
   executeQuery (res, query, tm_DBConfig);
 });
 
+// GET commchar_0815 from CommunityCharacteristics
+// EXAMPLE ac (Activity Center): /api/getACScores/ac
 app.get('/api/getACScores/:type', function(req , res) {
 
   var type =  req.params.type
@@ -342,7 +370,8 @@ app.get('/api/getACScores/:type', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-
+// GET commchar_0815 from CommunityCharacteristics
+// EXAMPLE nbh/Harbor (Neighborhood/Harbor): /api/getd3Data/nbh/Harbor
 app.get('/api/getd3Data/:type/:name', function(req , res) {
 
   var type =  req.params.type
