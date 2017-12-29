@@ -131,7 +131,10 @@ var  executeQuery = function (res, query, config) {
   })
 }
 
-//GET ScenarioWiz table from wmvp3 DB
+//******************************---wMVP3_CapeCodMA DATABASE CALLS---******************************
+
+//GET ScenarioWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
+//EXAMPLE: SCENARIO ID 2727 | http://sql-connect.api.capecodcommission.org/api/ScenarioWiz/2727
 app.get('/api/ScenarioWiz/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + req.params.id;
@@ -139,7 +142,8 @@ app.get('/api/ScenarioWiz/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-//GET TreatmentWiz table from wmvp3 DB
+//GET TreatmentWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
+//EXAMPLE: SCENARIO ID 2727 | http://sql-connect.api.capecodcommission.org/api/TreatmentWiz/2727
 app.get('/api/TreatmentWiz/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.Treatment_Wiz where ScenarioID = ' + req.params.id;
@@ -147,7 +151,8 @@ app.get('/api/TreatmentWiz/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-//GET Embayments table from wmvp3 DB
+//GET Embayments table from 'wMVP3_CapeCodMA' DB
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/Embayments
 app.get('/api/Embayments', function(req , res) {
 
   var query = 'select * from CapeCodMA.Embayments';
@@ -155,7 +160,8 @@ app.get('/api/Embayments', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-//GET FTCoeff table from wmvp3 DB
+//GET FTCoeff table from 'wMVP3_CapeCodMA' DB
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/FTCoeff
 app.get('/api/FTCoeff', function(req , res) {
 
   var query = 'select * from CapeCodMA.FTCoeff';
@@ -163,7 +169,8 @@ app.get('/api/FTCoeff', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET MATowns from wmvp3
+//GET MATowns from 'wMVP3_CapeCodMA' DB
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/MATowns
 app.get('/api/MATowns', function(req , res) {
 
   var query = 'select * from CapeCodMA.MATowns';
@@ -171,7 +178,8 @@ app.get('/api/MATowns', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET SubEmbayments from wmvp3
+//GET SubEmbayments from 'wMVP3_CapeCodMA' DB
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/SubEmbayments
 app.get('/api/SubEmbayments', function(req , res) {
 
   var query = 'select * from CapeCodMA.SubEmbayments';
@@ -179,7 +187,8 @@ app.get('/api/SubEmbayments', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET Subwatersheds from wmvp3
+//GET Subwatersheds from 'wMVP3_CapeCodMA' DB
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/Subwatersheds
 app.get('/api/Subwatersheds', function(req , res) {
 
   var query = 'select * from CapeCodMA.Subwatersheds';
@@ -187,8 +196,8 @@ app.get('/api/Subwatersheds', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET parcelMaster from wmvp3
-// EXAMPLE: scenarioid: /api/parcelMaster/2586
+//GET parcelMaster data from 'wMVP3_CapeCodMA' DB where scenario id = ##
+//EXAMPLE: SCENARIO ID 2488 | http://sql-connect.api.capecodcommission.org/api/parcelMaster/2488
 app.get('/api/parcelMaster/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.parcelMaster WHERE scenario_id = ' + req.params.id;
@@ -196,8 +205,8 @@ app.get('/api/parcelMaster/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET wiz_treatment_towns from wmvp3
-// EXAMPLE: scenarioid: /api/wiz_treatment_towns/2586
+//GET wiz_treatment_towns data from 'wMVP3_CapeCodMA' DB where scenario id = ##
+//EXAMPLE: SCENARIO ID 2488 | http://sql-connect.api.capecodcommission.org/api/wiz_treatment_towns/2488
 app.get('/api/wiz_treatment_towns/:id', function(req , res) {
 
   var query = 'select * from dbo.wiz_treatment_towns WHERE wtt_scenario_id = ' + req.params.id;
@@ -206,8 +215,8 @@ app.get('/api/wiz_treatment_towns/:id', function(req , res) {
 });
 
 
-// GET WastewaterSource3 from wmvp3
-// EXAMPLE: scenarioid: /api/WastewaterSource3/242
+//GET WastewaterSource3 data from 'wMVP3_CapeCodMA' DB where municipal id = ##
+//EXAMPLE: SCENARIO ID 224 | http://sql-connect.api.capecodcommission.org/api/WastewaterSource3/224
 app.get('/api/WastewaterSource3/:id', function(req , res) {
 
   var query = 'select * from dbo.WastewaterSource3 WHERE Muni_ID = ' + req.params.id;
@@ -215,8 +224,8 @@ app.get('/api/WastewaterSource3/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET ParcelCharacteristics from wmvp3
-// EXAMPLE: scenarioid: /api/ParcelCharacteristics/242
+//GET ParcelCharacteristics data from 'wMVP3_CapeCodMA' DB where municipal id = ##
+//EXAMPLE: SCENARIO ID 224 | http://sql-connect.api.capecodcommission.org/api/ParcelCharacteristics/224
 app.get('/api/ParcelCharacteristics/:id', function(req , res) {
 
   var query = 'select * from dbo.ParcelCharacteristics WHERE Muni_ID = ' + req.params.id;
@@ -224,8 +233,11 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
   executeQuery (res, query, wmvp3_DBConfig);
 });
 
-// GET WaterQualityReading from WaterQualityMonitoring
-// EXAMPLE: WMO36: /api/getEmbayment/WMO36
+//******************************---WaterQualityMonitoring DATABASE CALLS---******************************
+
+//*****TODO: REMOVE THIS CALL ONCE NEW WQ APP IS FULLY FUNCTIONAL & REPLACED BY 'getStateion' CALL BELOW THIS*****
+//GET WaterQualityReading data from from 'WaterQualityMonitoring' DB where U id (Water Quality Monitoring Station ID) = XXX###
+//EXAMPLE: Water Quality Monitoring Station ID 'HB2' | http://sql-connect.api.capecodcommission.org/api/getEmbayment/HB2
 app.get("/api/getEmbayment/:name", function(req , res) {
 
   var query = "SELECT \
@@ -247,8 +259,9 @@ app.get("/api/getEmbayment/:name", function(req , res) {
   executeQuery (res, query, wqm_DBConfig);
 });
 
-// GET WaterQualityReading from WaterQualityMonitoring
-// EXAMPLE: /api/getStation/WMO36
+
+//GET WaterQualityReading data from from 'WaterQualityMonitoring' DB where U id (Water Quality Monitoring Station ID) = XXX###
+//EXAMPLE: Water Quality Monitoring Station ID 'HB2' | http://sql-connect.api.capecodcommission.org/api/getStation/HB2
 app.get("/api/getStation/:name", function(req , res) {
 
   var query = "SELECT \
@@ -270,14 +283,17 @@ app.get("/api/getStation/:name", function(req , res) {
   executeQuery (res, query, wqm_DBConfig);
 });
 
-// GET StgEmbaymentWaterQualityData from WaterQualityMonitoring
-// EXAMPLE: Allen Harbor: /api/StgEmbaymentWaterQualityData/101
+//GET Embayment data from 'WaterQualityMonitoring' where embayment id is not null & embayment is in Barnstable County (Cape Cod)
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getEmbayments/
 app.get('/api/getEmbayments', function(req , res) {
 
-  var query = 'select id as EMBAYMENT_ID, Name as EMBAYMENT from dbo.Embayment where id is not null and id < 161' 
+  var query = 'select id as EMBAYMENT_ID, Name as EMBAYMENT from dbo.Embayment where id is not null and id < 160'
 
   executeQuery (res, query, wqm_DBConfig);
 });
+
+//******************************---CommunityCharacteristics DATABASE CALLS---******************************
+//*****TODO: UPDATE ALL 'CommunityCharacteristics' CALLS*****
 
 // GET commchar_0815 from CommunityCharacteristics
 app.get('/api/getNeighborhoods', function(req , res) {
@@ -301,15 +317,6 @@ app.get('/api/getTowns', function(req , res) {
   var query = "select distinct Town as town from dbo.commchar_0815 where Town != ''"
 
   executeQuery (res, query, comchar_DBConfig);
-});
-
-// GET Technology_Matrix from Tech_Matrix
-// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11
-app.get('/api/Technology_Matrix/:id', function(req , res) {
-
-  var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
-
-  executeQuery (res, query, tm_DBConfig);
 });
 
 // GET commchar_0815 from CommunityCharacteristics
@@ -424,6 +431,17 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
   }
 
   executeQuery (res, query, comchar_DBConfig);
+});
+
+//******************************---Tech_Matrix DATABASE CALLS---******************************
+
+// GET Technology_Matrix from Tech_Matrix
+// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11
+app.get('/api/Technology_Matrix/:id', function(req , res) {
+
+  var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
+
+  executeQuery (res, query, tm_DBConfig);
 });
 
 

@@ -4,8 +4,8 @@
   "private": true,
   "description": "Node.js application for data delivery from the [wMVP3_CapeCodMA] database on SIO-SQL-01-SIOSQL01 (Internal: 10.10.1.174: 1433 | ??External: SIO-SQL-01.barnstablecounty.org:65335??) to frontend & backend custom applications.",
   "author": {
-  "name": "Cape Cod Commission",
-  "email": "frontdesk@capecodcommission.org"
+    "name": "Cape Cod Commission",
+    "email": "frontdesk@capecodcommission.org"
   },
   "license": "n/a",
   "scripts": {
