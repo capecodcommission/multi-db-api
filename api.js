@@ -293,9 +293,9 @@ app.get('/api/getEmbayments', function(req , res) {
 });
 
 //******************************---CommunityCharacteristics DATABASE CALLS---******************************
-//*****TODO: UPDATE ALL 'CommunityCharacteristics' CALLS*****
 
-// GET commchar_0815 from CommunityCharacteristics
+//GET Neighborhood Name data from 'commchar_0815'
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getNeighborhoods
 app.get('/api/getNeighborhoods', function(req , res) {
 
   var query = "select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''"
@@ -303,7 +303,8 @@ app.get('/api/getNeighborhoods', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-// GET commchar_0815 from CommunityCharacteristics
+//GET Activity Center Name data from 'commchar_0815'
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getActivityCenters
 app.get('/api/getActivityCenters', function(req , res) {
 
   var query = "select distinct AC_FINAL as center from dbo.commchar_0815 where AC_FINAL != ''"
@@ -311,7 +312,8 @@ app.get('/api/getActivityCenters', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-// GET commchar_0815 from CommunityCharacteristics
+//GET Town Name data from 'commchar_0815'
+//EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTowns
 app.get('/api/getTowns', function(req , res) {
 
   var query = "select distinct Town as town from dbo.commchar_0815 where Town != ''"
@@ -319,8 +321,8 @@ app.get('/api/getTowns', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-// GET commchar_0815 from CommunityCharacteristics
-// EXAMPLE ac (Activity Center): /api/getACScores/ac
+//GET Selected Geography Score data from 'commchar_0815'
+//EXAMPLE: Neighborhood score data | http://sql-connect.api.capecodcommission.org/api/getACScores/nbh
 app.get('/api/getACScores/:type', function(req , res) {
 
   var type =  req.params.type
@@ -377,8 +379,8 @@ app.get('/api/getACScores/:type', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-// GET commchar_0815 from CommunityCharacteristics
-// EXAMPLE nbh/Harbor (Neighborhood/Harbor): /api/getd3Data/nbh/Harbor
+//GET d3 Chart data by Selected Geograhy Name and Type from 'commchar_0815'
+//EXAMPLE: Neighborhood: Ridgewood score data | http://sql-connect.api.capecodcommission.org/api/getd3Data/nbh/Ridgewood
 app.get('/api/getd3Data/:type/:name', function(req , res) {
 
   var type =  req.params.type
