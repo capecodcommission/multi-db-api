@@ -44,7 +44,6 @@ var wmvp3_DBConfig = {
 var wqm_DBConfig = {
   user: 'DBAccess',
   password: 'Acce$$DB',
-  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
   server: '10.10.1.174',
   port: '65335',
   database: 'WaterQualityMonitoring',
@@ -59,7 +58,6 @@ var wqm_DBConfig = {
 var tm_DBConfig = {
   user: 'DBAccess',
   password: 'Acce$$DB',
-  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
   server: '10.10.1.174',
   port: '65335',
   database: 'Tech_Matrix',
@@ -74,7 +72,6 @@ var tm_DBConfig = {
 var comchar_DBConfig = {
   user: 'DBAccess',
   password: 'Acce$$DB',
-  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
   server: '10.10.1.174',
   port: '65335',
   database: 'CommunityCharacteristics',
@@ -310,7 +307,7 @@ app.get('/api/getEmbayments', function(req , res) {
 
 //******************************---CommunityCharacteristics DATABASE CALLS---******************************
 
-//GET Neighborhood Name data from 'commchar_0815'
+//GET Neighborhood Name data from 'commchar_0815' table in 'CommunityCharacteristics' DB
 //EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getNeighborhoods
 app.get('/api/getNeighborhoods', function(req , res) {
 
@@ -319,7 +316,7 @@ app.get('/api/getNeighborhoods', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-//GET Activity Center Name data from 'commchar_0815'
+//GET Activity Center Name data from 'commchar_0815' table in 'CommunityCharacteristics' DB
 //EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getActivityCenters
 app.get('/api/getActivityCenters', function(req , res) {
 
@@ -328,7 +325,7 @@ app.get('/api/getActivityCenters', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-//GET Town Name data from 'commchar_0815'
+//GET Town Name data from 'commchar_0815' table in 'CommunityCharacteristics' DB
 //EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTowns
 app.get('/api/getTowns', function(req , res) {
 
@@ -337,7 +334,7 @@ app.get('/api/getTowns', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-//GET Selected Geography Score data from 'commchar_0815'
+//GET Selected Geography Score data from 'commchar_0815' table in 'CommunityCharacteristics' DB
 //EXAMPLE: Neighborhood score data | http://sql-connect.api.capecodcommission.org/api/getACScores/nbh
 app.get('/api/getACScores/:type', function(req , res) {
 
@@ -395,7 +392,7 @@ app.get('/api/getACScores/:type', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
-//GET d3 Chart data by Selected Geograhy Name and Type from 'commchar_0815'
+//GET d3 Chart data from by Selected Geograhy Name and Type from 'commchar_0815' table in 'CommunityCharacteristics' DB
 //EXAMPLE: Neighborhood: Ridgewood score data | http://sql-connect.api.capecodcommission.org/api/getd3Data/nbh/Ridgewood
 app.get('/api/getd3Data/:type/:name', function(req , res) {
 
@@ -453,8 +450,8 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 
 //******************************---Tech_Matrix DATABASE CALLS---******************************
 
-// GET Technology_Matrix from Tech_Matrix
-// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed: /api/Technology_Matrix/11
+// GET Technology_Matrix data from 'Tech_Matrix' DB where 'TM_ID' = ##
+// EXAMPLE: Aquaculture - Shellfish Cultivated In Estuary Bed | http://sql-connect.api.capecodcommission.org/api/Technology_Matrix/11
 app.get('/api/Technology_Matrix/:id', function(req , res) {
 
   var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
