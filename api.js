@@ -283,6 +283,22 @@ app.get("/api/getStation/:name", function(req , res) {
   executeQuery (res, query, wqm_DBConfig);
 });
 
+//GET Station names from WaterQualityReading where Name (Embayment Name) = NAME
+//EXAMPLE: Embayment 'Three Bays' | http://sql-connect.api.capecodcommission.org/api/getStations/Three%20Bays
+app.get("/api/getStations/:name", function(req , res) {
+
+  var query = "select DISTINCT \
+                r.Uid \
+                from dbo.Embayment e \
+                left join dbo.Station s \
+                  on e.Id = s.EmbaymentId\
+                left join dbo.WaterQualityReading r \
+                  on s.Name = r.Uid \
+                where e.Name = " + "'" + req.params.name + "'"
+
+  executeQuery (res, query, wqm_DBConfig);
+});
+
 //GET Embayment data from 'WaterQualityMonitoring' where embayment id is not null & embayment is in Barnstable County (Cape Cod)
 //EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getEmbayments/
 app.get('/api/getEmbayments', function(req , res) {
