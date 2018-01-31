@@ -291,7 +291,7 @@ app.get("/api/getStations/:name", function(req , res) {
                   on e.Id = s.EmbaymentId\
                 left join dbo.WaterQualityReading r \
                   on s.Name = r.Uid \
-                where e.Name = " + "'" + req.params.name + "'"
+                where r.Uid is not null and e.Name = " + "'" + req.params.name + "'"
 
   executeQuery (res, query, wqm_DBConfig);
 });
