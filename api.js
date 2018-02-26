@@ -262,6 +262,8 @@ app.get("/api/getEmbayment/:name", function(req , res) {
 app.get("/api/getStation/:name", function(req , res) {
 
   var query = "SELECT \
+                a.* \
+                FROM (SELECT \
                 Date as date, \
                 case WHEN SalFin IS NOT NULL THEN SalFin when  CorrectedSalinityPpt IS NOT NULL THEN CorrectedSalinityPpt WHEN SalinityPpt IS NOT NULL THEN SalinityPpt else null end as salinity, \
                 case when DoMgFin IS NOT NULL THEN DoMgFin when  CorrectedDoMgPL IS NOT NULL THEN CorrectedDoMgPL when DoMgPL is not null then DoMgPL else null end as disolvedoxygen, \
@@ -275,8 +277,18 @@ app.get("/api/getStation/:name", function(req , res) {
                 ChlaUgPL as chlorophyll, \
                 PhaeoUgPL as phaeophytin \
                FROM dbo.WaterQualityReading \
-               WHERE Uid = " + "'" + req.params.name + "'" + 'ORDER BY cast(DATE as date)';
-
+               WHERE Uid = " + "'" + req.params.name + "'" + ') a \
+              WHERE a.salinity IS NOT NULL \
+              OR a.disolvedoxygen IS NOT NULL \
+              OR a.nitrogen IS NOT NULL \
+              OR a.water_temp IS NOT NULL \
+              OR a.precipitation IS NOT NULL \
+              OR a.depth IS NOT NULL \
+              OR a.nitrate_nitrite IS NOT NULL \
+              OR a.ammonium IS NOT NULL \
+              OR a.orthophosphate IS NOT NULL \
+              OR a.chlorophyll IS NOT NULL \
+              OR a.phaeophytin IS NOT NULL'
   executeQuery (res, query, wqm_DBConfig);
 });
 
