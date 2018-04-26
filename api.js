@@ -70,8 +70,8 @@ var tm_DBConfig = {
 };
 
 var comchar_DBConfig = {
-  user: 'DBAccess',
-  password: 'Acce$$DB',
+  user: 'ACExecute',
+  password: 'ACEi$theplACE',
   server: '10.10.1.174',
   port: '65335',
   database: 'CommunityCharacteristics',
@@ -459,6 +459,17 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 
   executeQuery (res, query, comchar_DBConfig);
 });
+
+
+// EXECUTE getParcelSums stored proc to retrieve parcel summations for selection
+// EXAMPLE: Hyannis GIZ | http://sql-connect.api.capecodcommission.org/api/getParcelSums/HyannisGIZ
+app.get('/api/getParcelSums/:selection', function(req , res) {
+
+  var query = 'exec getParcelSums ' + req.params.selection;
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
 
 //******************************---Tech_Matrix DATABASE CALLS---******************************
 
