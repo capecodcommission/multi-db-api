@@ -464,8 +464,9 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 
 // EXECUTE getParcelSums stored proc to retrieve parcel summations for selection
 // EXAMPLE: 
+// var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
-// var data = {rings: completeRings} // Pass complete polygon rings as object to API route
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
 // var url = 'http://localhost:8081/api/getParcelSums/'
 // $.ajax({
 //   method: 'POST',
@@ -473,9 +474,128 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 //   contentType: 'application/json',
 //   url: url
 // })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
 app.post('/api/getParcelSums/', function(req , res) {
 
-  var query = 'exec getParcelSums ' + "'" + req.body.rings + "'"
+  var query = 'exec getParcelSums ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE getParcelSums1MI stored proc to retrieve parcel summations within 1MI of selection
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass town name and complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/getParcelSums1MI/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/getParcelSums1MI/', function(req , res) {
+
+  var query = 'exec getParcelSums1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE getParcelSumsROT stored proc to retrieve parcel summations within town and outside selection
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass town name and complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/getParcelSums/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/getParcelSumsROT/', function(req , res) {
+
+  var query = 'exec getParcelSumsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE selectBlockGroups stored proc to retrieve intersecting block groups given intersecting parcel populations
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectBlockGroups/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectBlockGroups/', function(req , res) {
+
+  var query = 'exec selectBlockGroups ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE selectBlockGroups1MI stored proc to retrieve intersecting block groups given intersecting parcel populations within 1MI
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectBlockGroups1MI/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectBlockGroups1MI/', function(req , res) {
+
+  var query = 'exec selectBlockGroups1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE selectBlockGroupsROT stored proc to retrieve block groups within the remainder of a town but outside of 1mi from the selection
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectBlockGroupsROT/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectBlockGroupsROT/', function(req , res) {
+
+  var query = 'exec selectBlockGroupsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
   executeQuery (res, query, comchar_DBConfig);
 });
