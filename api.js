@@ -2,6 +2,7 @@
 var express = require("express");
     bodyParser = require("body-parser");
     sql = require("mssql");
+    request = require("request");
     app = express();
 
 // tell the app to use the body parser middleware
@@ -600,6 +601,75 @@ app.post('/api/selectBlockGroupsROT/', function(req , res) {
   executeQuery (res, query, comchar_DBConfig);
 });
 
+// EXECUTE selectTracts stored proc to retrieve tract ids intersecting with the selection
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectTracts/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectTracts/', function(req , res) {
+
+  var query = 'exec selectTracts ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE selectTracts1MI stored proc to retrieve tract ids intersecting parcel populations within 1MI
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectTracts1MI/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectTracts1MI/', function(req , res) {
+
+  var query = 'exec selectTracts1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
+// EXECUTE selectTractsROT stored proc to retrieve tracts within the remainder of a town but outside of 1mi from the selection
+// EXAMPLE: 
+// var townName = 'BARNSTABLE'
+// var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
+// var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
+// var url = 'http://localhost:8081/api/selectTractsROT/'
+// $.ajax({
+//   method: 'POST',
+//   data: data,
+//   contentType: 'application/json',
+//   url: url
+// })
+// .done(function(response) {
+                                
+//   console.log(response)
+// })
+app.post('/api/selectTractsROT/', function(req , res) {
+
+  var query = 'exec selectTractsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
+
+  executeQuery (res, query, comchar_DBConfig);
+});
+
 
 //******************************---Tech_Matrix DATABASE CALLS---******************************
 
@@ -610,6 +680,142 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
   var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
 
   executeQuery (res, query, tm_DBConfig);
+});
+
+//******************************---US Census API CALLS---******************************
+
+// GET Census Blocks (5th call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks5
+app.get('/api/getBlks5', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B17017_001E,B17017_002E,B11005_001E,B11005_002E,B25070_001E,B25070_007E,B25070_008E,B25070_009E,B25070_010E,B25070_011E,B25091_001E,B25091_008E,B25091_009E,B25091_010E,B25091_011E,B25091_012E,B25091_019E,B25091_020E,B25091_021E,B25091_022E,B25091_023E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Census Blocks (4th call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks4
+app.get('/api/getBlks4', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25063_003E,B25063_004E,B25063_005E,B25063_006E,B25063_007E,B25063_008E,B25063_009E,B25063_010E,B25063_011E,B25063_012E,B25063_013E,B25063_014E,B25063_015E,B25063_016E,B25063_017E,B25063_018E,B25063_019E,B25063_020E,B25063_021E,B25063_022E,B25063_023E,B25063_024E,B25063_025E,B25063_026E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Census Blocks (3rd call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks3
+app.get('/api/getBlks3', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25075_002E,B25075_003E,B25075_004E,B25075_005E,B25075_006E,B25075_007E,B25075_008E,B25075_009E,B25075_010E,B25075_011E,B25075_012E,B25075_013E,B25075_014E,B25075_015E,B25075_016E,B25075_017E,B25075_018E,B25075_019E,B25075_020E,B25075_021E,B25075_022E,B25075_023E,B25075_024E,B25075_025E,B25075_026E,B25075_027E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Census Blocks (2nd call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks2
+app.get('/api/getBlks2', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E,B25003_002E,B25003_003E,B25004_002E,B25004_003E,B25004_004E,B25004_005E,B25004_006E,B25004_007E,B25004_008E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Census Blocks (1st call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks
+app.get('/api/getBlks', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Tracts (1st call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTracts
+app.get('/api/getTracts', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Tracts (2nd call) data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTracts2
+app.get('/api/getTracts2', function (req, res) {
+  if (!req.params) {
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.send(body);
+    }
+  });
+});
+
+// GET Census Towns data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusTowns
+app.get('/api/getCensusTowns', function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      res.send(body);
+    }
+  });
 });
 
 
