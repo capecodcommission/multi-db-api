@@ -763,7 +763,7 @@ app.get('/api/getBlks2', cache('30 days'), function (req, res) {
 
 app.post('/api/getCachedHousing', cache('30 days'), function (req, res) {
 
-  res.send(cachedHousing)
+  res.send(req.body.idArray)
 
   // var filteredArray = cachedHousing.filter((el => {
 
