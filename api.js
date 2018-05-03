@@ -4,6 +4,10 @@ var express = require("express");
     sql = require("mssql");
     request = require("request");
     app = express();
+    apicache = require('apicache')
+
+let cache = apicache.middleware
+
 
 // tell the app to use the body parser middleware
 app.use(bodyParser.json({limit: "50mb"}));
@@ -732,20 +736,73 @@ app.get('/api/getBlks3', function (req, res) {
   });
 });
 
+
+var cachedHousing = []
+
 // GET Census Blocks (2nd call) data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks2
-app.get('/api/getBlks2', function (req, res) {
+app.get('/api/getBlks2', cache('30 days'), function (req, res) {
+
   if (!req.params) {
+
     res.status(500);
     res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
+
   request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E,B25003_002E,B25003_003E,B25004_002E,B25004_003E,B25004_004E,B25004_005E,B25004_006E,B25004_007E,B25004_008E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
+
     if (!error && response.statusCode == 200) {
-      res.send(body);
+
+      var jsonBody = JSON.parse(body)
+
+      cachedHousing = jsonBody
     }
   });
+});
+
+app.post('/api/getCachedHousing', cache('30 days'), function (req, res) {
+
+  var filteredArray = cachedHousing.filter((el => {
+
+    return req.body.idArray.includes(el[13] + el[14])
+  }))
+
+  var totalHousingSelected = 0 
+  var totalSeasonalSelected = 0
+  var totalOwnOccpSelected = 0
+  var totalRntOccpSelected = 0
+  var totalForRentSelected = 0
+  var totalRntNotOccSelected = 0
+  var totalForSaleSelected = 0
+  var totalSoldNotOccSelected = 0
+  var totalSeaRecOccSelected = 0
+  var totalMigrantSelected = 0
+  var totalOtherVacSelected = 0
+
+  filteredArray.map((k) => {
+
+    totalHousingSelected += parseInt(k[0])
+    totalSeasonalSelected += parseInt(k[1]) // Append/fill census attributes by column index
+    totalOwnOccpSelected += parseInt(k[2])
+    totalRntOccpSelected += parseInt(k[3])
+    totalForRentSelected += parseInt(k[4])
+    totalRntNotOccSelected += parseInt(k[5])
+    totalForSaleSelected += parseInt(k[6])
+    totalSoldNotOccSelected += parseInt(k[7])
+    totalSeaRecOccSelected += parseInt(k[8])
+    totalMigrantSelected += parseInt(k[9])
+    totalOtherVacSelected += parseInt(k[10])
+  })
+
+  var newObject = {
+
+    totalHousing: totalHousingSelected,
+    totalSeasonal: totalSeasonalSelected
+  }
+
+  res.send(newObject)
 });
 
 // GET Census Blocks (1st call) data from the US Census API where columns are listed after "=" in url string
@@ -767,14 +824,19 @@ app.get('/api/getBlks', function (req, res) {
 // GET Tracts (1st call) data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTracts
 app.get('/api/getTracts', function (req, res) {
+
   if (!req.params) {
+
     res.status(500);
     res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=tract:012600&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
+
     if (!error && response.statusCode == 200) {
+
       res.send(body);
     }
   });
