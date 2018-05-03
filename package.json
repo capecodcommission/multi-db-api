@@ -12,6 +12,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "apicache": "^1.2.1",
     "body-parser": "*",
     "express": "*",
     "mssql": "*",
