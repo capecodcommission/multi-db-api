@@ -687,6 +687,8 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
 
 //******************************---US Census API CALLS---******************************
 
+var globalCensusHousingOcc = []
+
 // GET Census Blocks (5th call) data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks5
 app.get('/api/getBlks5', function (req, res) {
@@ -735,12 +737,9 @@ app.get('/api/getBlks3', function (req, res) {
   });
 });
 
-
-var cachedHousing = []
-
 // GET Census Blocks (2nd call) data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks2
-app.get('/api/getBlks2', cache('30 days'), function (req, res) {
+app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
 
   if (!req.params) {
 
@@ -756,49 +755,58 @@ app.get('/api/getBlks2', cache('30 days'), function (req, res) {
 
       var jsonBody = JSON.parse(body)
 
-      cachedHousing = jsonBody
+      globalCensusHousingOcc = jsonBody
     }
   });
 });
 
-app.post('/api/getCachedHousing', cache('30 days'), function (req, res) {
+app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res) {
 
-  var filteredArray = cachedHousing.filter((el => {
+  var filteredArray = globalCensusHousingOcc.filter((el => {
 
     return req.body.idArray.includes(el[13] + el[14])
   }))
 
-  var totalHousingSelected = 0 
-  var totalSeasonalSelected = 0
-  var totalOwnOccpSelected = 0
-  var totalRntOccpSelected = 0
-  var totalForRentSelected = 0
-  var totalRntNotOccSelected = 0
-  var totalForSaleSelected = 0
-  var totalSoldNotOccSelected = 0
-  var totalSeaRecOccSelected = 0
-  var totalMigrantSelected = 0
-  var totalOtherVacSelected = 0
+  var totalHousing = 0 
+  var totalSeasonal = 0
+  var totalOwnOccp = 0
+  var totalRntOccp = 0
+  var totalForRent = 0
+  var totalRntNotOcc = 0
+  var totalForSale = 0
+  var totalSoldNotOcc = 0
+  var totalSeaRecOcc = 0
+  var totalMigrant = 0
+  var totalOtherVac = 0
 
   filteredArray.map((k) => {
 
-    totalHousingSelected += parseInt(k[0])
-    totalSeasonalSelected += parseInt(k[1]) // Append/fill census attributes by column index
-    totalOwnOccpSelected += parseInt(k[2])
-    totalRntOccpSelected += parseInt(k[3])
-    totalForRentSelected += parseInt(k[4])
-    totalRntNotOccSelected += parseInt(k[5])
-    totalForSaleSelected += parseInt(k[6])
-    totalSoldNotOccSelected += parseInt(k[7])
-    totalSeaRecOccSelected += parseInt(k[8])
-    totalMigrantSelected += parseInt(k[9])
-    totalOtherVacSelected += parseInt(k[10])
+    totalHousing += parseInt(k[0])
+    totalSeasonal += parseInt(k[1]) // Append/fill census attributes by column index
+    totalOwnOccp += parseInt(k[2])
+    totalRntOccp += parseInt(k[3])
+    totalForRent += parseInt(k[4])
+    totalRntNotOcc += parseInt(k[5])
+    totalForSale += parseInt(k[6])
+    totalSoldNotOcc += parseInt(k[7])
+    totalSeaRecOcc += parseInt(k[8])
+    totalMigrant += parseInt(k[9])
+    totalOtherVac += parseInt(k[10])
   })
 
   var newObject = {
 
-    totalHousing: totalHousingSelected,
-    totalSeasonal: totalSeasonalSelected
+    totalHousing: totalHousing,
+    totalSeasonal: totalSeasonal,
+    totalOwnOccp: totalOwnOccp,
+    totalRntOccp: totalRntOccp,
+    totalForRent: totalForRent,
+    totalRntNotOcc: totalRntNotOcc,
+    totalForSale: totalForSale,
+    totalSoldNotOcc: totalSoldNotOcc,
+    totalSeaRecOcc: totalSeaRecOcc,
+    totalMigrant: totalMigrant,
+    totalOtherVac: totalOtherVac
   }
 
   res.send(newObject)
