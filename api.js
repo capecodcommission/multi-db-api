@@ -763,45 +763,47 @@ app.get('/api/getBlks2', cache('30 days'), function (req, res) {
 
 app.post('/api/getCachedHousing', cache('30 days'), function (req, res) {
 
-  var filteredArray = cachedHousing.filter((el => {
+  res.send(cachedHousing)
 
-    return req.body.idArray.includes(el[13] + el[14])
-  }))
+  // var filteredArray = cachedHousing.filter((el => {
 
-  var totalHousingSelected = 0 
-  var totalSeasonalSelected = 0
-  var totalOwnOccpSelected = 0
-  var totalRntOccpSelected = 0
-  var totalForRentSelected = 0
-  var totalRntNotOccSelected = 0
-  var totalForSaleSelected = 0
-  var totalSoldNotOccSelected = 0
-  var totalSeaRecOccSelected = 0
-  var totalMigrantSelected = 0
-  var totalOtherVacSelected = 0
+  //   return req.body.idArray.includes(el[13] + el[14])
+  // }))
 
-  filteredArray.map((k) => {
+  // var totalHousingSelected = 0 
+  // var totalSeasonalSelected = 0
+  // var totalOwnOccpSelected = 0
+  // var totalRntOccpSelected = 0
+  // var totalForRentSelected = 0
+  // var totalRntNotOccSelected = 0
+  // var totalForSaleSelected = 0
+  // var totalSoldNotOccSelected = 0
+  // var totalSeaRecOccSelected = 0
+  // var totalMigrantSelected = 0
+  // var totalOtherVacSelected = 0
 
-    totalHousingSelected += parseInt(k[0])
-    totalSeasonalSelected += parseInt(k[1]) // Append/fill census attributes by column index
-    totalOwnOccpSelected += parseInt(k[2])
-    totalRntOccpSelected += parseInt(k[3])
-    totalForRentSelected += parseInt(k[4])
-    totalRntNotOccSelected += parseInt(k[5])
-    totalForSaleSelected += parseInt(k[6])
-    totalSoldNotOccSelected += parseInt(k[7])
-    totalSeaRecOccSelected += parseInt(k[8])
-    totalMigrantSelected += parseInt(k[9])
-    totalOtherVacSelected += parseInt(k[10])
-  })
+  // filteredArray.map((k) => {
 
-  var newObject = {
+  //   totalHousingSelected += parseInt(k[0])
+  //   totalSeasonalSelected += parseInt(k[1]) // Append/fill census attributes by column index
+  //   totalOwnOccpSelected += parseInt(k[2])
+  //   totalRntOccpSelected += parseInt(k[3])
+  //   totalForRentSelected += parseInt(k[4])
+  //   totalRntNotOccSelected += parseInt(k[5])
+  //   totalForSaleSelected += parseInt(k[6])
+  //   totalSoldNotOccSelected += parseInt(k[7])
+  //   totalSeaRecOccSelected += parseInt(k[8])
+  //   totalMigrantSelected += parseInt(k[9])
+  //   totalOtherVacSelected += parseInt(k[10])
+  // })
 
-    totalHousing: totalHousingSelected,
-    totalSeasonal: totalSeasonalSelected
-  }
+  // var newObject = {
 
-  res.send(newObject)
+  //   totalHousing: totalHousingSelected,
+  //   totalSeasonal: totalSeasonalSelected
+  // }
+
+  // res.send(newObject)
 });
 
 // GET Census Blocks (1st call) data from the US Census API where columns are listed after "=" in url string
