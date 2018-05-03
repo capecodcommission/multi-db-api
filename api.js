@@ -5,8 +5,7 @@ var express = require("express");
     request = require("request");
     app = express();
     apicache = require('apicache')
-
-let cache = apicache.middleware
+    cache = apicache.middleware
 
 
 // tell the app to use the body parser middleware
