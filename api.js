@@ -467,7 +467,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 
 
 // EXECUTE getParcelSums stored proc to retrieve parcel summations for selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -479,7 +479,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/getParcelSums/', function(req , res) {
@@ -490,7 +490,7 @@ app.post('/api/getParcelSums/', function(req , res) {
 });
 
 // EXECUTE getParcelSums1MI stored proc to retrieve parcel summations within 1MI of selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass town name and complete polygon rings as object to API route
@@ -502,7 +502,7 @@ app.post('/api/getParcelSums/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/getParcelSums1MI/', function(req , res) {
@@ -513,7 +513,7 @@ app.post('/api/getParcelSums1MI/', function(req , res) {
 });
 
 // EXECUTE getParcelSumsROT stored proc to retrieve parcel summations within town and outside selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass town name and complete polygon rings as object to API route
@@ -525,7 +525,7 @@ app.post('/api/getParcelSums1MI/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/getParcelSumsROT/', function(req , res) {
@@ -536,7 +536,7 @@ app.post('/api/getParcelSumsROT/', function(req , res) {
 });
 
 // EXECUTE selectBlockGroups stored proc to retrieve intersecting block groups given intersecting parcel populations
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -548,7 +548,7 @@ app.post('/api/getParcelSumsROT/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectBlockGroups/', function(req , res) {
@@ -559,7 +559,7 @@ app.post('/api/selectBlockGroups/', function(req , res) {
 });
 
 // EXECUTE selectBlockGroups1MI stored proc to retrieve intersecting block groups given intersecting parcel populations within 1MI
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -571,7 +571,7 @@ app.post('/api/selectBlockGroups/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectBlockGroups1MI/', function(req , res) {
@@ -582,7 +582,7 @@ app.post('/api/selectBlockGroups1MI/', function(req , res) {
 });
 
 // EXECUTE selectBlockGroupsROT stored proc to retrieve block groups within the remainder of a town but outside of 1mi from the selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -594,7 +594,7 @@ app.post('/api/selectBlockGroups1MI/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectBlockGroupsROT/', function(req , res) {
@@ -605,7 +605,7 @@ app.post('/api/selectBlockGroupsROT/', function(req , res) {
 });
 
 // EXECUTE selectTracts stored proc to retrieve tract ids intersecting with the selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -617,7 +617,7 @@ app.post('/api/selectBlockGroupsROT/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectTracts/', function(req , res) {
@@ -628,7 +628,7 @@ app.post('/api/selectTracts/', function(req , res) {
 });
 
 // EXECUTE selectTracts1MI stored proc to retrieve tract ids intersecting parcel populations within 1MI
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -640,7 +640,7 @@ app.post('/api/selectTracts/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectTracts1MI/', function(req , res) {
@@ -651,7 +651,7 @@ app.post('/api/selectTracts1MI/', function(req , res) {
 });
 
 // EXECUTE selectTractsROT stored proc to retrieve tracts within the remainder of a town but outside of 1mi from the selection
-// EXAMPLE: 
+// EXAMPLE:
 // var townName = 'BARNSTABLE'
 // var completeRings = '-7825103.056629799 5108269.629483548, -7824682.652974231 5106998.863888308, -7825389.6954858685 5106425.586176171, -7825962.973198006 5107572.141600447, -7825103.056629799 5108269.629483548'
 // var data = {town: townName, rings: completeRings} // Pass complete polygon rings as object to API route
@@ -663,7 +663,7 @@ app.post('/api/selectTracts1MI/', function(req , res) {
 //   url: url
 // })
 // .done(function(response) {
-                                
+
 //   console.log(response)
 // })
 app.post('/api/selectTractsROT/', function(req , res) {
@@ -687,7 +687,9 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
 
 //******************************---US Census API CALLS---******************************
 
-var globalCensusHousingOcc = []
+var globalCenusData = [];
+var globalCensusIncomeEmploymentEducation = [];
+var globalCensusHousingOcc = [];
 
 // GET Census Blocks (5th call) data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks5
@@ -737,8 +739,10 @@ app.get('/api/getBlks3', function (req, res) {
   });
 });
 
-// GET Census Blocks (2nd call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks2
+// Creates a cache of Census Housing Occupancy data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHousingOcc
 app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
 
   if (!req.params) {
@@ -760,14 +764,17 @@ app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
   });
 });
 
+// Creates a new data object, 'censusHousingOccupancyData', holding Census Housing Occupancy totals data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusHousingOcc', which happens every 30 days.
+// POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
 app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res) {
-
   var filteredArray = globalCensusHousingOcc.filter((el => {
 
     return req.body.idArray.includes(el[13] + el[14])
   }))
 
-  var totalHousing = 0 
+  var totalHousing = 0 // US Census column ABC###
   var totalSeasonal = 0
   var totalOwnOccp = 0
   var totalRntOccp = 0
@@ -794,7 +801,7 @@ app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res)
     totalOtherVac += parseInt(k[10])
   })
 
-  var newObject = {
+  var censusHousingOccupancyData = {
 
     totalHousing: totalHousing,
     totalSeasonal: totalSeasonal,
@@ -809,23 +816,196 @@ app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res)
     totalOtherVac: totalOtherVac
   }
 
-  res.send(newObject)
+  res.send(censusHousingOccupancyData);
 });
 
-// GET Census Blocks (1st call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks
-app.get('/api/getBlks', function (req, res) {
+// Creates a cache of Census Income, Employment & Education data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusIncomeEmploymentEducationTotals' to store the cached data in 'globalCensusHousingOcc'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusIncomeEmploymentEducation
+app.get('/api/cacheCensusIncomeEmploymentEducation', cache('30 days'), function (req, res) {
+
   if (!req.params) {
+
     res.status(500);
     res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
+
   request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
+
     if (!error && response.statusCode == 200) {
-      res.send(body);
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusIncomeEmploymentEducation = jsonBody
     }
   });
+});
+
+// Creates a new data object, 'censusIncomeEmploymentEducation', holding Census Income, Employment & Education totals data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusIncomeEmploymentEducation' to store the cached data in 'globalCensusIncomeEmploymentEducation'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusIncomeEmploymentEducation', which happens every 30 days.
+// POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
+app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), function (req, res) {
+  var filteredArray = globalCensusIncomeEmploymentEducation.filter((el => {
+
+    return req.body.idArray.includes(el[52] + el[53])
+  }))
+
+  // Income
+  var totalLess10k = 0;  // US Census column ABC###
+  var totalTen14 = 0;
+  var totalFif19 = 0;
+  var totalTwenty24 = 0;
+  var totalTwentyFive29 = 0;
+  var totalThirty34 = 0;
+  var totalThirtyFive39 = 0;
+  var totalFourty44 = 0;
+  var totalFourtyFive49 = 0;
+  var totalFifty59 = 0;
+  var totalSixty74 = 0;
+  var totalSeventyFive99 = 0;
+  var totalHundred124 = 0;
+  var totalHundredTwentyFive149 = 0;
+  var totalHundredFifty199 = 0;
+  var totalTwoHundredPlus = 0;
+
+  // Employment
+  var totalCivilLabor = 0;
+  var totalUnemp = 0;
+
+  // Education
+  var totalEdu = 0;
+  var totalNoSchool = 0;
+  var totalNursery = 0;
+  var totalKindergarten = 0;
+  var totalG1 = 0;
+  var totalG2 = 0;
+  var totalG3 = 0;
+  var totalG4 = 0;
+  var totalG5 = 0;
+  var totalG6 = 0;
+  var totalG7 = 0;
+  var totalG8 = 0;
+  var totalG9 = 0;
+  var totalG10 = 0;
+  var totalG11 = 0;
+  var totalG12 = 0;
+  var totalHS = 0;
+  var totalGED = 0;
+  var totalSCLess1 = 0;
+  var totalSCMore1 = 0;
+  var totalAss = 0;
+  var totalBac = 0;
+  var totalMas = 0;
+  var totalPro = 0;
+  var totalDoc = 0;
+
+  filteredArray.map((k) => {
+
+    // Income
+    totalLess10k += parseInt(k[2])
+    totalTen14 += parseInt(k[3])
+    totalFif19 += parseInt(k[4])
+    totalTwenty24 += parseInt(k[5])
+    totalTwentyFive29 += parseInt(k[6])
+    totalThirty34 += parseInt(k[7])
+    totalThirtyFive39 += parseInt(k[8])
+    totalFourty44 += parseInt(k[9])
+    totalFourtyFive49 += parseInt(k[10])
+    totalFifty59 += parseInt(k[11])
+    totalSixty74 += parseInt(k[12])
+    totalSeventyFive99 += parseInt(k[13])
+    totalHundred124 += parseInt(k[14])
+    totalHundredTwentyFive149 += parseInt(k[15])
+    totalHundredFifty199 += parseInt(k[16])
+    totalTwoHundredPlus += parseInt(k[17])
+
+    // Employment
+    totalCivilLabor += parseInt(k[18])
+    totalUnemp += parseInt(k[19])
+
+    // Education
+    totalEdu += parseInt(k[20])
+    totalNoSchool += parseInt(k[21])
+    totalNursery += parseInt(k[22])
+    totalKindergarten += parseInt(k[23])
+    totalG1 += parseInt(k[24])
+    totalG2 += parseInt(k[25])
+    totalG3 += parseInt(k[26])
+    totalG4 += parseInt(k[27])
+    totalG5 += parseInt(k[28])
+    totalG6 += parseInt(k[29])
+    totalG7 += parseInt(k[30])
+    totalG8 += parseInt(k[31])
+    totalG9 += parseInt(k[32])
+    totalG10 += parseInt(k[33])
+    totalG11 += parseInt(k[34])
+    totalG12 += parseInt(k[35])
+    totalHS += parseInt(k[36])
+    totalGED += parseInt(k[37])
+    totalSCLess1 += parseInt(k[38])
+    totalSCMore1 += parseInt(k[39])
+    totalAss += parseInt(k[40])
+    totalBac += parseInt(k[41])
+    totalMas += parseInt(k[42])
+    totalPro += parseInt(k[43])
+    totalDoc += parseInt(k[44])
+  })
+
+  var censusIncomeEmploymentEducation = {
+
+    // Income
+    totalLess10k: totalLess10k,
+    totalTen14: totalTen14,
+    totalFif19: totalFif19,
+    totalTwenty24: totalTwenty24,
+    totalTwentyFive29: totalTwentyFive29,
+    totalThirty34: totalThirty34,
+    totalThirtyFive39: totalThirtyFive39,
+    totalFourty44: totalFourty44,
+    totalFourtyFive49: totalFourtyFive49,
+    totalFifty59: totalFifty59,
+    totalSixty74: totalSixty74,
+    totalSeventyFive99: totalSeventyFive99,
+    totalHundred124: totalHundred124,
+    totalHundredTwentyFive149: totalHundredTwentyFive149,
+    totalHundredFifty199: totalHundredFifty199,
+    totalTwoHundredPlus: totalTwoHundredPlus,
+    // Employment
+    totalCivilLabor: totalCivilLabor,
+    totalUnemp: totalUnemp,
+    // Education
+    totalEdu: totalEdu,
+    totalNoSchool: totalNoSchool,
+    totalNursery: totalNursery,
+    totalKindergarten: totalKindergarten,
+    totalG1: totalG1,
+    totalG2: totalG2,
+    totalG3: totalG3,
+    totalG4: totalG4,
+    totalG5: totalG5,
+    totalG6: totalG6,
+    totalG7: totalG7,
+    totalG8: totalG8,
+    totalG9: totalG9,
+    totalG10: totalG10,
+    totalG11: totalG11,
+    totalG12: totalG12,
+    totalHS: totalHS,
+    totalGED: totalGED,
+    totalSCLess1: totalSCLess1,
+    totalSCMore1: totalSCMore1,
+    totalAss: totalAss,
+    totalBac: totalBac,
+    totalMas: totalMas,
+    totalPro: totalPro,
+    totalDoc: totalDoc
+  }
+
+  res.send(censusIncomeEmploymentEducation)
 });
 
 // GET Tracts (1st call) data from the US Census API where columns are listed after "=" in url string
@@ -877,7 +1057,7 @@ app.get('/api/getCensusTowns', function (req, res) {
   }
 
   request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  
+
   function(error, response, body) {
 
     if (!error && response.statusCode == 200) {
