@@ -691,37 +691,249 @@ var globalCenusData = [];
 var globalCensusIncomeEmploymentEducation = [];
 var globalCensusHousingOcc = [];
 var globalCensusHomePrice = [];
+var globalCensusRent = [];
+var globalCensusEduTract = [];
+var globalCensusEduTown = [];
+var globalCensusAffordability = [];
 
-// GET Census Blocks (5th call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks5
-app.get('/api/getBlks5', function (req, res) {
+// Creates a cache of Census affordability (poverty, renting, and mortgage) data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusAffordabilityTotals' to store the cached data in 'globalCensusAffordability'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusAffordability
+app.get('/api/cacheCensusAffordability', function (req, res) {
+
   if (!req.params) {
+
     res.status(500);
     res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
   request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B17017_001E,B17017_002E,B11005_001E,B11005_002E,B25070_001E,B25070_007E,B25070_008E,B25070_009E,B25070_010E,B25070_011E,B25091_001E,B25091_008E,B25091_009E,B25091_010E,B25091_011E,B25091_012E,B25091_019E,B25091_020E,B25091_021E,B25091_022E,B25091_023E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
+
     if (!error && response.statusCode == 200) {
-      res.send(body);
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusAffordability = jsonBody
     }
   });
 });
 
-// GET Census Blocks (4th call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getBlks4
-app.get('/api/getBlks4', function (req, res) {
+// Creates a cache of Census Home price data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusHomePriceTotals' to store the cached data in 'globalCensusHomePrice'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHomePrice
+app.get('/api/cacheCensusRent', cache('30 days'), function (req, res) {
+
   if (!req.params) {
+
     res.status(500);
     res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
+
   request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25063_003E,B25063_004E,B25063_005E,B25063_006E,B25063_007E,B25063_008E,B25063_009E,B25063_010E,B25063_011E,B25063_012E,B25063_013E,B25063_014E,B25063_015E,B25063_016E,B25063_017E,B25063_018E,B25063_019E,B25063_020E,B25063_021E,B25063_022E,B25063_023E,B25063_024E,B25063_025E,B25063_026E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
+
     if (!error && response.statusCode == 200) {
-      res.send(body);
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusRent = jsonBody
     }
   });
+});
+
+// Creates a new data object, 'censusAffordabilityData', holding Census poverty, renting, and mortgage totals data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusRent' to store the cached data in 'globalCensusAffordability'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusRent', which happens every 30 days.
+// POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAffordabilityTotals
+app.post('/api/getCensusAffordabilityTotals', cache('30 days'), function (req, res) {
+
+  var filteredArray = globalCensusAffordability.filter((el => {
+
+    return req.body.idArray.includes(el[23] + el[24])
+  }))
+
+  // Poverty
+  var totalHouseholdsBelowPoverty = 0 // US Census column ABC###
+  var totalIncomeBelowPoverty = 0
+
+  // Age
+  var totalHouseholdsUnder18 = 0
+  var totalOneOrMore18 = 0
+
+  // Renting
+  var totalHouseholdsRenting = 0
+  var totalRentingThirty349 = 0
+  var totalRentingThirtyFive399 = 0
+  var totalRentingForty499 = 0
+  var totalRentingFiftyPlus = 0
+  var totalRentingNotComputed = 0
+
+  // Mortgage
+  var totalHouseholdsMortgage = 0
+  var totalMortgageThirty349 = 0
+  var totalMortgageThirtyFive399 = 0
+  var totalMortgageForty499 = 0
+  var totalMortgageFiftyPlus = 0
+  var totalMortgageNotComputed = 0
+  var totalNoMortgageThirty349 = 0
+  var totalNoMortgageThirtyFive399 = 0
+  var totalNoMortgageForty499 = 0
+  var totalNoMortgageFiftyPlus = 0
+  var totalNoMortgageNotComputed = 0
+
+
+  filteredArray.map((k) => {
+
+    totalHouseholdsBelowPoverty += parseInt(k[0])
+    totalIncomeBelowPoverty += parseInt(k[1])
+
+    totalHouseholdsUnder18 += parseInt(k[2])
+    totalOneOrMore18 += parseInt(k[3])
+
+    totalHouseholdsRenting += parseInt(k[4])
+    totalRentingThirty349 += parseInt(k[5])
+    totalRentingThirtyFive399 += parseInt(k[6])
+    totalRentingForty499 += parseInt(k[7])
+    totalRentingFiftyPlus += parseInt(k[8])
+    totalRentingNotComputed += parseInt(k[9])
+
+    totalHouseholdsMortgage += parseInt(k[10])
+    totalMortgageThirty349 += parseInt(k[11])
+    totalMortgageThirtyFive399 += parseInt(k[12])
+    totalMortgageForty499 += parseInt(k[13])
+    totalMortgageFiftyPlus += parseInt(k[14])
+    totalMortgageNotComputed += parseInt(k[15])
+    totalNoMortgageThirty349 += parseInt(k[16])
+    totalNoMortgageThirtyFive399 += parseInt(k[17])
+    totalNoMortgageForty499 += parseInt(k[18])
+    totalNoMortgageFiftyPlus += parseInt(k[19])
+    totalNoMortgageNotComputed += parseInt(k[20])
+  })
+
+  var HHBelowPovertyLine = totalIncomeBelowPoverty / totalHouseholdsBelowPoverty
+  var HHWithChildren = totalOneOrMore18 / totalHouseholdsUnder18
+
+  var totalRentingOwnedHosueholds = totalHouseholdsRenting + totalHouseholdsMortgage
+  var totalNotComputed = totalRentingNotComputed + totalMortgageNotComputed + totalNoMortgageNotComputed
+  var totalHHSpending = totalRentingThirty349 + totalRentingThirtyFive399 + totalRentingForty499 + totalRentingFiftyPlus + totalMortgageThirty349 + totalMortgageThirtyFive399 + totalMortgageForty499 + totalMortgageFiftyPlus + totalNoMortgageThirty349 + totalNoMortgageThirtyFive399 + totalNoMortgageForty499 + totalNoMortgageFiftyPlus
+
+  var HHSpendingGreater30 = totalOwned / (totalRentingOwnedHosueholds - totalNotComputed)
+
+  var censusAffordabilityData = {
+
+    HHBelowPovertyLine: HHBelowPovertyLine,
+    HHWithChildren: HHWithChildren,
+    HHSpendingGreater30: HHSpendingGreater30
+  }
+
+  res.send(censusAffordabilityData);
+});
+
+// Creates a new data object, 'censusRentData', holding Census rental totals data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusRent' to store the cached data in 'globalCensusRent'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusRent', which happens every 30 days.
+// POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHomePriceMedian
+app.post('/api/getCensusRentMedian', cache('30 days'), function (req, res) {
+
+  var filteredArray = globalCensusRent.filter((el => {
+
+    return req.body.idArray.includes(el[26] + el[27])
+  }))
+
+  // Init rental data totals
+  var totalRentLess100 = 0
+  var totalRentHundred149 = 0
+  var totalRentHundredFifty199 = 0
+  var totalRentTwoHundred249 = 0
+  var totalRentTwoFifty299 = 0
+  var totalRentThreeHundred349 = 0
+  var totalRentThreeFifty399 = 0
+  var totalRentFourHundred449 = 0
+  var totalRentFourFifty499 = 0
+  var totalRentFiveHundred549 = 0
+  var totalRentFiveFifty599 = 0
+  var totalRentSixHundred649 = 0
+  var totalRentSixFifty699 = 0
+  var totalRentSevenHundred749 = 0
+  var totalRentSevenFifty799 = 0
+  var totalRentEightHundred899 = 0
+  var totalRentNineHundred999 = 0
+  var totalRentThousand1249 = 0
+  var totalRentTwelveFifty1499 = 0
+  var totalRentFifteenHundred1999 = 0
+  var totalRentTwoThousand2499 = 0
+  var totalRentTwentyFiveHundred2999 = 0
+  var totalRentThreeThousand3499 = 0
+  var totalRentThirtyFiveHundredPlus = 0
+
+  filteredArray.map((k) => {
+
+    totalRentLess100 += parseInt(k[0])
+    totalRentHundred149 += parseInt(k[1])
+    totalRentHundredFifty199 += parseInt(k[2])
+    totalRentTwoHundred249 += parseInt(k[3])
+    totalRentTwoFifty299 += parseInt(k[4])
+    totalRentThreeHundred349 += parseInt(k[5])
+    totalRentThreeFifty399 += parseInt(k[6])
+    totalRentFourHundred449 += parseInt(k[7])
+    totalRentFourFifty499 += parseInt(k[8])
+    totalRentFiveHundred549 += parseInt(k[9])
+    totalRentFiveFifty599 += parseInt(k[10])
+    totalRentSixHundred649 += parseInt(k[11])
+    totalRentSixFifty699 += parseInt(k[12])
+    totalRentSevenHundred749 += parseInt(k[13])
+    totalRentSevenFifty799 += parseInt(k[14])
+    totalRentEightHundred899 += parseInt(k[15])
+    totalRentNineHundred999 += parseInt(k[16])
+    totalRentThousand1249 += parseInt(k[17])
+    totalRentTwelveFifty1499 += parseInt(k[18])
+    totalRentFifteenHundred1999 += parseInt(k[19])
+    totalRentTwoThousand2499 += parseInt(k[20])
+    totalRentTwentyFiveHundred2999 += parseInt(k[21])
+    totalRentThreeThousand3499 += parseInt(k[22])
+    totalRentThirtyFiveHundredPlus += parseInt(k[23])
+  })
+
+  var totalRent = totalRentLess100 + totalRentHundred149 + totalRentHundredFifty199 + totalRentTwoHundred249 + totalRentTwoFifty299 + totalRentThreeHundred349 + totalRentThreeFifty399 + totalRentFourHundred449 + totalRentFourFifty499 + totalRentFiveHundred549 + totalRentFiveFifty599 + totalRentSixHundred649 + totalRentSixFifty699 + totalRentSevenHundred749 + totalRentSevenFifty799 + totalRentEightHundred899 + totalRentNineHundred999 + totalRentThousand1249 + totalRentTwelveFifty1499 + totalRentFifteenHundred1999 + totalRentTwoThousand2499 + totalRentTwentyFiveHundred2999 + totalRentThreeThousand3499 + totalRentThirtyFiveHundredPlus
+  var totalsArr = [
+    totalRent,
+    totalRentLess100,
+    totalRentHundred149,
+    totalRentHundredFifty199,
+    totalRentTwoHundred249,
+    totalRentTwoFifty299,
+    totalRentThreeHundred349,
+    totalRentThreeFifty399,
+    totalRentFourHundred449,
+    totalRentFourFifty499,
+    totalRentFiveHundred549,
+    totalRentFiveFifty599,
+    totalRentSixHundred649,
+    totalRentSixFifty699,
+    totalRentSevenHundred749,
+    totalRentSevenFifty799,
+    totalRentEightHundred899,
+    totalRentNineHundred999,
+    totalRentThousand1249,
+    totalRentTwelveFifty1499,
+    totalRentFifteenHundred1999,
+    totalRentTwoThousand2499,
+    totalRentTwentyFiveHundred2999,
+    totalRentThreeThousand3499,
+    totalRentThirtyFiveHundredPlus
+  ]
+
+  var paretoMedian = calc_MedianRent(totalsArr)
+
+  var censusRentData = {
+
+    paretoMedian: paretoMedian
+  }
+
+  res.send(censusRentData);
 });
 
 // Creates a cache of Census Home price data at the Block Group level from the US Census API where columns are listed after "=" in url string.
@@ -1046,7 +1258,7 @@ function calc_MedianIncome(incomeData) {
 
 function calc_MedianHomePrice(incomeData) {
 
-  // Obtain upper bounds for each income bin along with sample population total
+  // Obtain upper bounds for each price bin along with sample population total
   var bucketTops = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 125000, 150000, 175000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000, 1500000, 2000000]
   var total =  incomeData[0]
 
@@ -1066,10 +1278,10 @@ function calc_MedianHomePrice(incomeData) {
   var thetaHat = 0
   var kHat = 0
 
-  // Start with second smallest income bin, skipping the 0th element (total population), and 1st element (smallest income bin)
+  // Start with second smallest price bin, skipping the 0th element (total price), and 1st element (smallest price bin)
   for (var i = 2; i < 26; i++) {
 
-    var bin = incomeData.slice(1,i) // Subset array starting from smallest income bin to ith element
+    var bin = incomeData.slice(1,i) // Subset array starting from smallest price bin to ith element
     var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
     var halfTotal = total / 2.0
     
@@ -1079,7 +1291,7 @@ function calc_MedianHomePrice(incomeData) {
       lowerBucket = i - 2 // Set lower/upper bucket bounds
       upperBucket = i - 1 
 
-      if (i == 16) { // Break loop if at final income bin
+      if (i == 25) { // Break loop if at final income bin
 
         break
       } else {
@@ -1100,11 +1312,94 @@ function calc_MedianHomePrice(incomeData) {
       }
     }
 
-    if (i == 25) { // return highest income bin if proportion condition unmet
+    if (i == 25) { // return highest price bin if proportion condition unmet
 
       console.log('i == 25')
 
       return 2000000
+    }
+  } // end loop
+
+  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
+
+    console.log('lowerperc is 0')
+
+    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
+  } else {
+
+    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of prices significantly larger than the lowest allowable price)
+    // Estimate k (Lowest allowable price in population)
+    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
+    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
+    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
+  }
+
+  var output = parseInt(sampleMedian.toFixed())
+
+  return output.toLocaleString() // Add thousands separator
+}
+
+function calc_MedianRent(incomeData) {
+
+  // Obtain upper bounds for each rental bin along with sample population total
+  var bucketTops = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 1250, 1500, 2000, 2500, 3000, 3500]
+  var total =  incomeData[0]
+
+  // Initialize variables to be conditionally filled
+  var lowerBucket = 0
+  var upperBucket = 0
+  var lowerBin = 0
+  var lowerSum = 0
+  var upperBin = 0
+  var upperSum = 0 
+  var lowerPerc = 0
+  var upperPerc = 0
+  var lowerIncome = 0
+  var upperIncome = 0
+
+  var sampleMedian = 0
+  var thetaHat = 0
+  var kHat = 0
+
+  // Start with second smallest rental bin, skipping the 0th element (total rent), and 1st element (smallest rental bin)
+  for (var i = 2; i < 24; i++) {
+
+    var bin = incomeData.slice(1,i) // Subset array starting from smallest rental bin to ith element
+    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
+    var halfTotal = total / 2.0
+    
+    // If the summed subset array is greater than half the sample population
+    if (binSum > halfTotal) {
+
+      lowerBucket = i - 2 // Set lower/upper bucket bounds
+      upperBucket = i - 1 
+
+      if (i == 23) { // Break loop if at final rental bin
+
+        break
+      } else {
+
+        // Create further lower/upper bounds expressed as sample proportions (%)
+        lowerBin = incomeData.slice(1,lowerBucket+1)
+        lowerSum = lowerBin.reduce((a,b) => {return a + b})
+
+        upperBin = incomeData.slice(1,upperBucket+1)
+        upperSum = upperBin.reduce((a,b) => {return a + b})
+
+        lowerPerc = lowerSum / total 
+        upperPerc = upperSum / total
+
+        lowerIncome = bucketTops[lowerBucket - 1]
+        upperIncome = bucketTops[upperBucket - 1]
+        break
+      }
+    }
+
+    if (i == 23) { // return highest rental bin if proportion condition unmet
+
+      console.log('i == 23')
+
+      return 3500
     }
   } // end loop
 
@@ -1246,7 +1541,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
 
   var percUnemp = totalUnemp / totalCivilLabor
 
-  percUnemp = parseFloat(percUnemp).toFixed(2)
+  percUnemp = parseFloat(percUnemp).toFixed(3)
 
   var totalHousehold = totalLess10k + totalTen14 + totalFif19 + totalTwenty24 + totalTwentyFive29 + totalThirty34 + totalThirtyFive39 + totalFourty44 + totalFourtyFive49 + totalFifty59 + totalSixty74 + totalSeventyFive99 + totalHundred124 + totalHundredTwentyFive149 + totalHundredFifty199 + totalTwoHundredPlus
 
@@ -1270,7 +1565,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
     totalTwoHundredPlus
   ]
 
-  var paretoMedian = calc_Median(totalsArr)
+  var paretoMedian = calc_MedianIncome(totalsArr)
 
   var censusIncomeEmploymentEducation = {
 
@@ -1287,9 +1582,11 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
   res.send(censusIncomeEmploymentEducation)
 });
 
-// GET Tracts (1st call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTracts
-app.get('/api/getTracts', function (req, res) {
+// Creates a cache of Census Education data at the Tract level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusEduTractTotals' to store the cached data in 'globalCensusEduTract'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusEduTract
+app.get('/api/cacheCensusEduTract', function (req, res) {
 
   if (!req.params) {
 
@@ -1298,35 +1595,59 @@ app.get('/api/getTracts', function (req, res) {
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
 
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=tract:012600&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
   function(error, response, body) {
 
     if (!error && response.statusCode == 200) {
 
-      res.send(body);
+      var jsonBody = JSON.parse(body)
+
+      globalCensusEduTract = jsonBody
     }
   });
 });
 
-// GET Tracts (2nd call) data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getTracts2
-app.get('/api/getTracts2', function (req, res) {
-  if (!req.params) {
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+// Creates a new data object, 'censusEduTractData', holding Census Education data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusEduTract' to store the cached data in 'globalCensusEduTract'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusEduTract', which happens every 30 days.
+// POST: {"idArray": ["013100","012900"]} <-- {"idArray": ["TRACT","TRACT"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTractTotals
+app.post('/api/getCensusEduTractTotals', cache('30 days'), function (req, res) {
+
+  var filteredArray = globalCensusEduTract.filter((el => {
+
+    return req.body.idArray.includes(el[7])
+  }))
+
+  var totalLessHSG = 0
+  var totalHSG = 0
+  var totalSCA = 0
+  var totalBac = 0
+  var totalGrad = 0
+
+  filteredArray.map((k) => {
+
+    totalLessHSG += parseInt(k[0])
+    totalHSG += parseInt(k[1]) // Append/fill census attributes by column index
+    totalSCA += parseInt(k[2])
+    totalBac += parseInt(k[3])
+    totalGrad += parseInt(k[4])
+  })
+
+  var censusEduTractData = {
+
+    totalLessHSG: totalLessHSG,
+    totalHSG: totalHSG,
+    totalSCA: totalSCA,
+    totalBac: totalBac,
+    totalGrad: totalGrad
   }
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  function(error, response, body) {
-    if (!error && response.statusCode == 200) {
-      res.send(body);
-    }
-  });
+
+  res.send(censusEduTractData);
 });
 
 // GET Census Towns data from the US Census API where columns are listed after "=" in url string
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusTowns
-app.get('/api/getCensusTowns', function (req, res) {
+app.get('/api/cacheCensusEduTown', function (req, res) {
 
   if (!req.params) {
 
@@ -1335,32 +1656,53 @@ app.get('/api/getCensusTowns', function (req, res) {
     console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
   }
 
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
 
   function(error, response, body) {
 
     if (!error && response.statusCode == 200) {
 
-      res.send(body);
+      var jsonBody = JSON.parse(body)
+
+      globalCensusEduTown = jsonBody
     }
   });
 });
 
+// Creates a new data object, 'censusEduTractData', holding Census Education data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusEduTract' to store the cached data in 'globalCensusEduTract'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusEduTract', which happens every 30 days.
+// POST: {"idArray": ["013100","012900"]} <-- {"idArray": ["TRACT","TRACT"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTownTotals
+app.post('/api/getCensusEduTownTotals', cache('30 days'), function (req, res) {
 
-//POST API
-//  app.post("/api/user ", function(req , res){
-//                 var query = "INSERT INTO [user] (Name,Email,Password) VALUES (req.body.Name,req.body.Email,req.body.Password”);
-//                 executeQuery (res, query);
-// });
-//
-// //PUT API
-//  app.put("/api/user/:id", function(req , res){
-//                 var query = "UPDATE [user] SET Name= " + req.body.Name  +  " , Email=  " + req.body.Email + "  WHERE Id= " + req.params.id;
-//                 executeQuery (res, query);
-// });
-//
-// // DELETE API
-//  app.delete("/api/user /:id", function(req , res){
-//                 var query = "DELETE FROM [user] WHERE Id=" + req.params.id;
-//                 executeQuery (res, query);
-// });
+  var filteredArray = globalCensusEduTown.filter((el => {
+
+    return req.body.idArray.includes(el[7])
+  }))
+
+  var totalLessHSG = 0
+  var totalHSG = 0
+  var totalSCA = 0
+  var totalBac = 0
+  var totalGrad = 0
+
+  filteredArray.map((k) => {
+
+    totalLessHSG += parseInt(k[0])
+    totalHSG += parseInt(k[1]) // Append/fill census attributes by column index
+    totalSCA += parseInt(k[2])
+    totalBac += parseInt(k[3])
+    totalGrad += parseInt(k[4])
+  })
+
+  var censusEduTownData = {
+
+    totalLessHSG: totalLessHSG,
+    totalHSG: totalHSG,
+    totalSCA: totalSCA,
+    totalBac: totalBac,
+    totalGrad: totalGrad
+  }
+
+  res.send(censusEduTownData);
+});
