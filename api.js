@@ -687,6 +687,7 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
 
 //******************************---US Census API CALLS---******************************
 
+// Initialize global census objects whose contents will be cached for 30 days
 var globalCenusData = [];
 var globalCensusIncomeEmploymentEducation = [];
 var globalCensusHousingOcc = [];
@@ -695,6 +696,281 @@ var globalCensusRent = [];
 var globalCensusEduTract = [];
 var globalCensusEduTown = [];
 var globalCensusAffordability = [];
+var globalCensusAge = [];
+
+// Initialize pareto interpolation functions
+function calc_MedianIncome(incomeData) {
+
+  // Obtain upper bounds for each income bin along with sample population total
+  var bucketTops = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 75000, 100000, 125000, 150000, 200000]
+  var total =  incomeData[0]
+
+  // Initialize variables to be conditionally filled
+  var lowerBucket = 0
+  var upperBucket = 0
+  var lowerBin = 0
+  var lowerSum = 0
+  var upperBin = 0
+  var upperSum = 0 
+  var lowerPerc = 0
+  var upperPerc = 0
+  var lowerIncome = 0
+  var upperIncome = 0
+
+  var sampleMedian = 0
+  var thetaHat = 0
+  var kHat = 0
+
+  // Start with second smallest income bin, skipping the first element (total population), and second element (smallest income bin)
+  for (var i = 2; i < 17; i++) {
+
+    var bin = incomeData.slice(1,i) // Subset array starting from smallest income bin to ith element
+    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
+    var halfTotal = total / 2.0
+    
+    // If the summed subset array is greater than half the sample population
+    if (binSum > halfTotal) {
+
+      lowerBucket = i - 2 // Set lower/upper bucket bounds
+      upperBucket = i - 1 
+
+      if (i == 16) { // Break loop if at final income bin
+
+        break
+      } else {
+
+        // Create further lower/upper bounds expressed as sample proportions (%)
+        lowerBin = incomeData.slice(1,lowerBucket+1)
+        lowerSum = lowerBin.reduce((a,b) => {return a + b})
+
+        upperBin = incomeData.slice(1,upperBucket+1)
+        upperSum = upperBin.reduce((a,b) => {return a + b})
+
+        lowerPerc = lowerSum / total 
+        upperPerc = upperSum / total
+
+        lowerIncome = bucketTops[lowerBucket - 1]
+        upperIncome = bucketTops[upperBucket - 1]
+        break
+      }
+    }
+
+    if (i == 16) { // return highest income bin if proportion condition unmet
+
+      console.log('i == 16')
+
+      return 200000
+    }
+  } // end loop
+
+  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
+
+    console.log('lowerperc is 0')
+
+    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
+  } else {
+
+    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of incomes significantly larger than the lowest allowable income)
+    // Estimate k (Lowest allowable income in population)
+    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
+    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
+    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
+  }
+
+  var output = parseInt(sampleMedian.toFixed())
+
+  return output.toLocaleString() // Add thousands separator
+}
+
+function calc_MedianHomePrice(priceData) {
+
+  // Obtain upper bounds for each price bin along with sample population total
+  var bucketTops = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 125000, 150000, 175000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000, 1500000, 2000000]
+  var total =  priceData[0]
+
+  // Initialize variables to be conditionally filled
+  var lowerBucket = 0
+  var upperBucket = 0
+  var lowerBin = 0
+  var lowerSum = 0
+  var upperBin = 0
+  var upperSum = 0 
+  var lowerPerc = 0
+  var upperPerc = 0
+  var lowerIncome = 0
+  var upperIncome = 0
+
+  var sampleMedian = 0
+  var thetaHat = 0
+  var kHat = 0
+
+  // Start with second smallest price bin, skipping the 0th element (total price), and 1st element (smallest price bin)
+  for (var i = 2; i < 26; i++) {
+
+    var bin = priceData.slice(1,i) // Subset array starting from smallest price bin to ith element
+    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
+    var halfTotal = total / 2.0
+    
+    // If the summed subset array is greater than half the sample population
+    if (binSum > halfTotal) {
+
+      lowerBucket = i - 2 // Set lower/upper bucket bounds
+      upperBucket = i - 1 
+
+      if (i == 25) { // Break loop if at final income bin
+
+        break
+      } else {
+
+        // Create further lower/upper bounds expressed as sample proportions (%)
+        lowerBin = priceData.slice(1,lowerBucket+1)
+        lowerSum = lowerBin.reduce((a,b) => {return a + b})
+
+        upperBin = priceData.slice(1,upperBucket+1)
+        upperSum = upperBin.reduce((a,b) => {return a + b})
+
+        lowerPerc = lowerSum / total 
+        upperPerc = upperSum / total
+
+        lowerIncome = bucketTops[lowerBucket - 1]
+        upperIncome = bucketTops[upperBucket - 1]
+        break
+      }
+    }
+
+    if (i == 25) { // return highest price bin if proportion condition unmet
+
+      console.log('i == 25')
+
+      return 2000000
+    }
+  } // end loop
+
+  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
+
+    console.log('lowerperc is 0')
+
+    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
+  } else {
+
+    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of prices significantly larger than the lowest allowable price)
+    // Estimate k (Lowest allowable price in population)
+    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
+    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
+    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
+  }
+
+  var output = parseInt(sampleMedian.toFixed())
+
+  return output.toLocaleString() // Add thousands separator
+}
+
+function calc_MedianRent(rentData) {
+
+  // Obtain upper bounds for each rental bin along with sample population total
+  var bucketTops = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 1250, 1500, 2000, 2500, 3000, 3500]
+  var total =  rentData[0]
+
+  // Initialize variables to be conditionally filled
+  var lowerBucket = 0
+  var upperBucket = 0
+  var lowerBin = 0
+  var lowerSum = 0
+  var upperBin = 0
+  var upperSum = 0 
+  var lowerPerc = 0
+  var upperPerc = 0
+  var lowerIncome = 0
+  var upperIncome = 0
+
+  var sampleMedian = 0
+  var thetaHat = 0
+  var kHat = 0
+
+  // Start with second smallest rental bin, skipping the 0th element (total rent), and 1st element (smallest rental bin)
+  for (var i = 2; i < 24; i++) {
+
+    var bin = rentData.slice(1,i) // Subset array starting from smallest rental bin to ith element
+    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
+    var halfTotal = total / 2.0
+    
+    // If the summed subset array is greater than half the sample population
+    if (binSum > halfTotal) {
+
+      lowerBucket = i - 2 // Set lower/upper bucket bounds
+      upperBucket = i - 1 
+
+      if (i == 23) { // Break loop if at final rental bin
+
+        break
+      } else {
+
+        // Create further lower/upper bounds expressed as sample proportions (%)
+        lowerBin = rentData.slice(1,lowerBucket+1)
+        lowerSum = lowerBin.reduce((a,b) => {return a + b})
+
+        upperBin = rentData.slice(1,upperBucket+1)
+        upperSum = upperBin.reduce((a,b) => {return a + b})
+
+        lowerPerc = lowerSum / total 
+        upperPerc = upperSum / total
+
+        lowerIncome = bucketTops[lowerBucket - 1]
+        upperIncome = bucketTops[upperBucket - 1]
+        break
+      }
+    }
+
+    if (i == 23) { // return highest rental bin if proportion condition unmet
+
+      console.log('i == 23')
+
+      return 3500
+    }
+  } // end loop
+
+  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
+
+    console.log('lowerperc is 0')
+
+    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
+  } else {
+
+    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of incomes significantly larger than the lowest allowable income)
+    // Estimate k (Lowest allowable income in population)
+    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
+    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
+    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
+  }
+
+  var output = parseInt(sampleMedian.toFixed())
+
+  return output.toLocaleString() // Add thousands separator
+}
+
+// Creates a cache of Census population age data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusAgeTotals' to store the cached data in 'globalCensusAge'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusAge
+app.get('/api/cacheCensusAge', function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B01001_003E,B01001_004E,B01001_005E,B01001_006E,B01001_007E,B01001_027E,B01001_028E,B01001_029E,B01001_030E,B01001_031E,B01001_008E,B01001_009E,B01001_010E,B01001_011E,B01001_012E,B01001_013E,B01001_014E,B01001_032E,B01001_033E,B01001_034E,B01001_035E,B01001_036E,B01001_037E,B01001_038E,B01001_015E,B01001_016E,B01001_017E,B01001_018E,B01001_019E,B01001_039E,B01001_040E,B01001_041E,B01001_042E,B01001_043E,B01001_020E,B01001_021E,B01001_022E,B01001_023E,B01001_024E,B01001_025E,B01001_044E,B01001_045E,B01001_046E,B01001_047E,B01001_048E,B01001_049E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusAge = jsonBody
+    }
+  });
+});
 
 // Creates a cache of Census affordability (poverty, renting, and mortgage) data at the Block Group level from the US Census API where columns are listed after "=" in url string.
 // Locally, this GET request must be run prior to posting to '/api/getCensusAffordabilityTotals' to store the cached data in 'globalCensusAffordability'.
@@ -740,6 +1016,129 @@ app.get('/api/cacheCensusRent', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusRent = jsonBody
+    }
+  });
+});
+
+// Creates a cache of Census Home price data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusHomePriceTotals' to store the cached data in 'globalCensusHomePrice'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHomePrice
+app.get('/api/cacheCensusHomePrice', cache('30 days'), function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25075_002E,B25075_003E,B25075_004E,B25075_005E,B25075_006E,B25075_007E,B25075_008E,B25075_009E,B25075_010E,B25075_011E,B25075_012E,B25075_013E,B25075_014E,B25075_015E,B25075_016E,B25075_017E,B25075_018E,B25075_019E,B25075_020E,B25075_021E,B25075_022E,B25075_023E,B25075_024E,B25075_025E,B25075_026E,B25075_027E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusHomePrice = jsonBody
+    }
+  });
+});
+
+// Creates a cache of Census Housing Occupancy data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHousingOcc
+app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E,B25003_002E,B25003_003E,B25004_002E,B25004_003E,B25004_004E,B25004_005E,B25004_006E,B25004_007E,B25004_008E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusHousingOcc = jsonBody
+    }
+  });
+});
+
+// Creates a cache of Census Income, Employment & Education data at the Block Group level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusIncomeEmploymentEducationTotals' to store the cached data in 'globalCensusHousingOcc'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusIncomeEmploymentEducation
+app.get('/api/cacheCensusIncomeEmploymentEducation', cache('30 days'), function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusIncomeEmploymentEducation = jsonBody
+    }
+  });
+});
+
+// Creates a cache of Census Education data at the Tract level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusEduTractTotals' to store the cached data in 'globalCensusEduTract'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusEduTract
+app.get('/api/cacheCensusEduTract', function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusEduTract = jsonBody
+    }
+  });
+});
+
+// GET Census Towns data from the US Census API where columns are listed after "=" in url string
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusTowns
+app.get('/api/cacheCensusEduTown', function (req, res) {
+
+  if (!req.params) {
+
+    res.status(500);
+    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
+    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
+  }
+
+  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
+
+  function(error, response, body) {
+
+    if (!error && response.statusCode == 200) {
+
+      var jsonBody = JSON.parse(body)
+
+      globalCensusEduTown = jsonBody
     }
   });
 });
@@ -820,7 +1219,7 @@ app.post('/api/getCensusAffordabilityTotals', cache('30 days'), function (req, r
   var totalNotComputed = totalRentingNotComputed + totalMortgageNotComputed + totalNoMortgageNotComputed
   var totalHHSpending = totalRentingThirty349 + totalRentingThirtyFive399 + totalRentingForty499 + totalRentingFiftyPlus + totalMortgageThirty349 + totalMortgageThirtyFive399 + totalMortgageForty499 + totalMortgageFiftyPlus + totalNoMortgageThirty349 + totalNoMortgageThirtyFive399 + totalNoMortgageForty499 + totalNoMortgageFiftyPlus
 
-  var HHSpendingGreater30 = totalOwned / (totalRentingOwnedHosueholds - totalNotComputed)
+  var HHSpendingGreater30 = totalHHSpending / (totalRentingOwnedHosueholds - totalNotComputed)
 
   var censusAffordabilityData = {
 
@@ -936,30 +1335,6 @@ app.post('/api/getCensusRentMedian', cache('30 days'), function (req, res) {
   res.send(censusRentData);
 });
 
-// Creates a cache of Census Home price data at the Block Group level from the US Census API where columns are listed after "=" in url string.
-// Locally, this GET request must be run prior to posting to '/api/getCensusHomePriceTotals' to store the cached data in 'globalCensusHomePrice'.
-// On 'api-app-05', this must be executed once every 30 days.
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHomePrice
-app.get('/api/cacheCensusHomePrice', cache('30 days'), function (req, res) {
-
-  if (!req.params) {
-
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-  }
-
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25075_002E,B25075_003E,B25075_004E,B25075_005E,B25075_006E,B25075_007E,B25075_008E,B25075_009E,B25075_010E,B25075_011E,B25075_012E,B25075_013E,B25075_014E,B25075_015E,B25075_016E,B25075_017E,B25075_018E,B25075_019E,B25075_020E,B25075_021E,B25075_022E,B25075_023E,B25075_024E,B25075_025E,B25075_026E,B25075_027E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  function(error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-
-      var jsonBody = JSON.parse(body)
-
-      globalCensusHomePrice = jsonBody
-    }
-  });
-});
-
 // Creates a new data object, 'censusHomePriceData', holding Census Housing Occupancy totals data. This is added to 'globalCenusData'.
 // Locally, this POST request must be run following running '/api/cacheCensusHomePrice' to store the cached data in 'globalCensusHomePrice'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusHomePrice', which happens every 30 days.
@@ -1070,31 +1445,6 @@ app.post('/api/getCensusHomePriceMedian', cache('30 days'), function (req, res) 
   res.send(censusHomePriceData);
 });
 
-// Creates a cache of Census Housing Occupancy data at the Block Group level from the US Census API where columns are listed after "=" in url string.
-// Locally, this GET request must be run prior to posting to '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
-// On 'api-app-05', this must be executed once every 30 days.
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusHousingOcc
-app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
-
-  if (!req.params) {
-
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
-  }
-
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B25004_006E,B25003_002E,B25003_003E,B25004_002E,B25004_003E,B25004_004E,B25004_005E,B25004_006E,B25004_007E,B25004_008E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  function(error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-
-      var jsonBody = JSON.parse(body)
-
-      globalCensusHousingOcc = jsonBody
-    }
-  });
-});
-
 // Creates a new data object, 'censusHousingOccupancyData', holding Census Housing Occupancy totals data. This is added to 'globalCenusData'.
 // Locally, this POST request must be run following running '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusHousingOcc', which happens every 30 days.
@@ -1148,280 +1498,6 @@ app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res)
   res.send(censusHousingOccupancyData);
 });
 
-// Creates a cache of Census Income, Employment & Education data at the Block Group level from the US Census API where columns are listed after "=" in url string.
-// Locally, this GET request must be run prior to posting to '/api/getCensusIncomeEmploymentEducationTotals' to store the cached data in 'globalCensusHousingOcc'.
-// On 'api-app-05', this must be executed once every 30 days.
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusIncomeEmploymentEducation
-app.get('/api/cacheCensusIncomeEmploymentEducation', cache('30 days'), function (req, res) {
-
-  if (!req.params) {
-
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
-  }
-
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B25001_001E,B01003_001E,B19001_002E,B19001_003E,B19001_004E,B19001_005E,B19001_006E,B19001_007E,B19001_008E,B19001_009E,B19001_010E,B19001_011E,B19001_012E,B19001_013E,B19001_014E,B19001_015E,B19001_016E,B19001_017E,B23025_003E,B23025_005E,B15003_001E,B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_017E,B15003_018E,B15003_019E,B15003_020E,B15003_021E,B15003_022E,B15003_023E,B15003_024E,B15003_025E,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=block%20group:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  function(error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-
-      var jsonBody = JSON.parse(body)
-
-      globalCensusIncomeEmploymentEducation = jsonBody
-    }
-  });
-});
-
-function calc_MedianIncome(incomeData) {
-
-  // Obtain upper bounds for each income bin along with sample population total
-  var bucketTops = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 75000, 100000, 125000, 150000, 200000]
-  var total =  incomeData[0]
-
-  // Initialize variables to be conditionally filled
-  var lowerBucket = 0
-  var upperBucket = 0
-  var lowerBin = 0
-  var lowerSum = 0
-  var upperBin = 0
-  var upperSum = 0 
-  var lowerPerc = 0
-  var upperPerc = 0
-  var lowerIncome = 0
-  var upperIncome = 0
-
-  var sampleMedian = 0
-  var thetaHat = 0
-  var kHat = 0
-
-  // Start with second smallest income bin, skipping the first element (total population), and second element (smallest income bin)
-  for (var i = 2; i < 17; i++) {
-
-    var bin = incomeData.slice(1,i) // Subset array starting from smallest income bin to ith element
-    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
-    var halfTotal = total / 2.0
-    
-    // If the summed subset array is greater than half the sample population
-    if (binSum > halfTotal) {
-
-      lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
-
-      if (i == 16) { // Break loop if at final income bin
-
-        break
-      } else {
-
-        // Create further lower/upper bounds expressed as sample proportions (%)
-        lowerBin = incomeData.slice(1,lowerBucket+1)
-        lowerSum = lowerBin.reduce((a,b) => {return a + b})
-
-        upperBin = incomeData.slice(1,upperBucket+1)
-        upperSum = upperBin.reduce((a,b) => {return a + b})
-
-        lowerPerc = lowerSum / total 
-        upperPerc = upperSum / total
-
-        lowerIncome = bucketTops[lowerBucket - 1]
-        upperIncome = bucketTops[upperBucket - 1]
-        break
-      }
-    }
-
-    if (i == 16) { // return highest income bin if proportion condition unmet
-
-      console.log('i == 16')
-
-      return 200000
-    }
-  } // end loop
-
-  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
-
-    console.log('lowerperc is 0')
-
-    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
-  } else {
-
-    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of incomes significantly larger than the lowest allowable income)
-    // Estimate k (Lowest allowable income in population)
-    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
-    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
-    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
-  }
-
-  var output = parseInt(sampleMedian.toFixed())
-
-  return output.toLocaleString() // Add thousands separator
-}
-
-function calc_MedianHomePrice(incomeData) {
-
-  // Obtain upper bounds for each price bin along with sample population total
-  var bucketTops = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 125000, 150000, 175000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000, 1500000, 2000000]
-  var total =  incomeData[0]
-
-  // Initialize variables to be conditionally filled
-  var lowerBucket = 0
-  var upperBucket = 0
-  var lowerBin = 0
-  var lowerSum = 0
-  var upperBin = 0
-  var upperSum = 0 
-  var lowerPerc = 0
-  var upperPerc = 0
-  var lowerIncome = 0
-  var upperIncome = 0
-
-  var sampleMedian = 0
-  var thetaHat = 0
-  var kHat = 0
-
-  // Start with second smallest price bin, skipping the 0th element (total price), and 1st element (smallest price bin)
-  for (var i = 2; i < 26; i++) {
-
-    var bin = incomeData.slice(1,i) // Subset array starting from smallest price bin to ith element
-    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
-    var halfTotal = total / 2.0
-    
-    // If the summed subset array is greater than half the sample population
-    if (binSum > halfTotal) {
-
-      lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
-
-      if (i == 25) { // Break loop if at final income bin
-
-        break
-      } else {
-
-        // Create further lower/upper bounds expressed as sample proportions (%)
-        lowerBin = incomeData.slice(1,lowerBucket+1)
-        lowerSum = lowerBin.reduce((a,b) => {return a + b})
-
-        upperBin = incomeData.slice(1,upperBucket+1)
-        upperSum = upperBin.reduce((a,b) => {return a + b})
-
-        lowerPerc = lowerSum / total 
-        upperPerc = upperSum / total
-
-        lowerIncome = bucketTops[lowerBucket - 1]
-        upperIncome = bucketTops[upperBucket - 1]
-        break
-      }
-    }
-
-    if (i == 25) { // return highest price bin if proportion condition unmet
-
-      console.log('i == 25')
-
-      return 2000000
-    }
-  } // end loop
-
-  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
-
-    console.log('lowerperc is 0')
-
-    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
-  } else {
-
-    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of prices significantly larger than the lowest allowable price)
-    // Estimate k (Lowest allowable price in population)
-    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
-    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
-    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
-  }
-
-  var output = parseInt(sampleMedian.toFixed())
-
-  return output.toLocaleString() // Add thousands separator
-}
-
-function calc_MedianRent(incomeData) {
-
-  // Obtain upper bounds for each rental bin along with sample population total
-  var bucketTops = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 1250, 1500, 2000, 2500, 3000, 3500]
-  var total =  incomeData[0]
-
-  // Initialize variables to be conditionally filled
-  var lowerBucket = 0
-  var upperBucket = 0
-  var lowerBin = 0
-  var lowerSum = 0
-  var upperBin = 0
-  var upperSum = 0 
-  var lowerPerc = 0
-  var upperPerc = 0
-  var lowerIncome = 0
-  var upperIncome = 0
-
-  var sampleMedian = 0
-  var thetaHat = 0
-  var kHat = 0
-
-  // Start with second smallest rental bin, skipping the 0th element (total rent), and 1st element (smallest rental bin)
-  for (var i = 2; i < 24; i++) {
-
-    var bin = incomeData.slice(1,i) // Subset array starting from smallest rental bin to ith element
-    var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
-    var halfTotal = total / 2.0
-    
-    // If the summed subset array is greater than half the sample population
-    if (binSum > halfTotal) {
-
-      lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
-
-      if (i == 23) { // Break loop if at final rental bin
-
-        break
-      } else {
-
-        // Create further lower/upper bounds expressed as sample proportions (%)
-        lowerBin = incomeData.slice(1,lowerBucket+1)
-        lowerSum = lowerBin.reduce((a,b) => {return a + b})
-
-        upperBin = incomeData.slice(1,upperBucket+1)
-        upperSum = upperBin.reduce((a,b) => {return a + b})
-
-        lowerPerc = lowerSum / total 
-        upperPerc = upperSum / total
-
-        lowerIncome = bucketTops[lowerBucket - 1]
-        upperIncome = bucketTops[upperBucket - 1]
-        break
-      }
-    }
-
-    if (i == 23) { // return highest rental bin if proportion condition unmet
-
-      console.log('i == 23')
-
-      return 3500
-    }
-  } // end loop
-
-  if (lowerPerc == 0.0) { // Use simple sample median calculation if lower bound proportion at zero, otherise interpolate
-
-    console.log('lowerperc is 0')
-
-    sampleMedian = lowerIncome + ((upperIncome - lowerIncome) / 2.0)
-  } else {
-
-    // Estimate theta (Pareto Index) ("distribution tail thinness") (Larger value indicates smaller proportion of incomes significantly larger than the lowest allowable income)
-    // Estimate k (Lowest allowable income in population)
-    thetaHat = (Math.log(1.0 - lowerPerc) - Math.log(1.0 - upperPerc)) / (Math.log(upperIncome) - Math.log(lowerIncome))
-    kHat = Math.pow( (upperPerc - lowerPerc) / ( (1/Math.pow(lowerIncome,thetaHat)) - (1/Math.pow(upperIncome,thetaHat)) ), (1/thetaHat) )
-    sampleMedian = (kHat * Math.pow(2,(1/thetaHat)))
-  }
-
-  var output = parseInt(sampleMedian.toFixed())
-
-  return output.toLocaleString() // Add thousands separator
-}
-
 // Creates a new data object, 'censusIncomeEmploymentEducation', holding Census Income, Employment & Education totals data. This is added to 'globalCenusData'.
 // Locally, this POST request must be run following running '/api/cacheCensusIncomeEmploymentEducation' to store the cached data in 'globalCensusIncomeEmploymentEducation'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusIncomeEmploymentEducation', which happens every 30 days.
@@ -1445,7 +1521,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
   var totalFourtyFive49 = 0;
   var totalFifty59 = 0;
   var totalSixty74 = 0;
-  var totalSeventyFive99 = 0;
+   var totalSeventyFive99 = 0;
   var totalHundred124 = 0;
   var totalHundredTwentyFive149 = 0;
   var totalHundredFifty199 = 0;
@@ -1534,10 +1610,11 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
     totalDoc += parseInt(k[44])
   })
 
-  var totalHSG = totalHS + totalGED
-  var totalSCA = totalSCLess1 + totalSCMore1 + totalAss
-  var totalGradPro = totalMas + totalPro + totalDoc
-  var totalLessHS = totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12
+  var totalHSG = (totalHS + totalGED) / totalEdu
+  var totalSCA = (totalSCLess1 + totalSCMore1 + totalAss) / totalEdu
+  var totalGradPro = (totalMas + totalPro + totalDoc) / totalEdu
+  var totalLessHS = (totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12) / totalEdu
+  totalBac = totalBac / totalEdu
 
   var percUnemp = totalUnemp / totalCivilLabor
 
@@ -1582,30 +1659,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
   res.send(censusIncomeEmploymentEducation)
 });
 
-// Creates a cache of Census Education data at the Tract level from the US Census API where columns are listed after "=" in url string.
-// Locally, this GET request must be run prior to posting to '/api/getCensusEduTractTotals' to store the cached data in 'globalCensusEduTract'.
-// On 'api-app-05', this must be executed once every 30 days.
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusEduTract
-app.get('/api/cacheCensusEduTract', function (req, res) {
 
-  if (!req.params) {
-
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
-  }
-
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=tract:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-  function(error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-
-      var jsonBody = JSON.parse(body)
-
-      globalCensusEduTract = jsonBody
-    }
-  });
-});
 
 // Creates a new data object, 'censusEduTractData', holding Census Education data. This is added to 'globalCenusData'.
 // Locally, this POST request must be run following running '/api/cacheCensusEduTract' to store the cached data in 'globalCensusEduTract'.
@@ -1623,15 +1677,59 @@ app.post('/api/getCensusEduTractTotals', cache('30 days'), function (req, res) {
   var totalSCA = 0
   var totalBac = 0
   var totalGrad = 0
+  var totalIncLength = 0
 
   filteredArray.map((k) => {
 
-    totalLessHSG += parseInt(k[0])
-    totalHSG += parseInt(k[1]) // Append/fill census attributes by column index
-    totalSCA += parseInt(k[2])
-    totalBac += parseInt(k[3])
-    totalGrad += parseInt(k[4])
+    totalIncLength++
+
+    // Replace negative values with 1
+    if (parseInt(k[0]) < 0) {
+
+      totalLessHSG += 1
+    } else {
+
+      totalLessHSG += parseInt(k[0])
+    }
+
+    if (parseInt(k[1]) < 0) {
+
+      totalHSG += 1
+    } else {
+
+      totalHSG += parseInt(k[1])
+    }
+
+    if (parseInt(k[2]) < 0) {
+
+      totalSCA += 1
+    } else {
+
+      totalSCA += parseInt(k[2])
+    }
+
+    if (parseInt(k[3]) < 0) {
+
+      totalBac += 1
+    } else {
+
+      totalBac += parseInt(k[3])
+    }
+
+    if (parseInt(k[4]) < 0) {
+
+      totalGrad += 1
+    } else {
+
+      totalGrad += parseInt(k[4])
+    }
   })
+
+  totalLessHSG = totalLessHSG / totalIncLength
+  totalHSG = totalHSG / totalIncLength
+  totalSCA = totalSCA / totalIncLength
+  totalBac = totalBac / totalIncLength
+  totalGrad = totalGrad / totalIncLength
 
   var censusEduTractData = {
 
@@ -1643,30 +1741,6 @@ app.post('/api/getCensusEduTractTotals', cache('30 days'), function (req, res) {
   }
 
   res.send(censusEduTractData);
-});
-
-// GET Census Towns data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusTowns
-app.get('/api/cacheCensusEduTown', function (req, res) {
-
-  if (!req.params) {
-
-    res.status(500);
-    res.send({"Error": "Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested."});
-    console.log("Looks like something went wrong with the request. Check the url for the request to see if it's constructed incorrectly or if there are too many columns requested.");
-  }
-
-  request.get({url:"https://api.census.gov/data/2016/acs/acs5?get=NAME,B20004_002E,B20004_003E,B20004_004E,B20004_005E,B20004_006E&for=county%20subdivision:*&in=state:25%20county:001&key=8c7a3c5bf959c4358f3e0eee9b07cd95d7856f5c"},
-
-  function(error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-
-      var jsonBody = JSON.parse(body)
-
-      globalCensusEduTown = jsonBody
-    }
-  });
 });
 
 // Creates a new data object, 'censusEduTractData', holding Census Education data. This is added to 'globalCenusData'.
@@ -1705,4 +1779,138 @@ app.post('/api/getCensusEduTownTotals', cache('30 days'), function (req, res) {
   }
 
   res.send(censusEduTownData);
+});
+
+// Creates a new data object, 'censusAgeData', holding Census age totals data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusAge' to store the cached data in 'globalCensusAge'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusAge', which happens every 30 days.
+// POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAgeTotals
+app.post('/api/getCensusAgeTotals', cache('30 days'), function (req, res) {
+
+  var filteredArray = globalCensusAge.filter((el => {
+
+    return req.body.idArray.includes(el[48] + el[49])
+  }))
+
+  // Ages 0 - 19
+  var totalMaleUnder5 = 0 
+  var totalMaleFive9 = 0
+  var totalMaleTen14 = 0
+  var totalMaleFifteen17 = 0
+  var totalMaleEighteen19 = 0
+  var totalFemaleUnder5 = 0 
+  var totalFemaleFive9 = 0
+  var totalFemaleTen14 = 0
+  var totalFemaleFifteen17 = 0
+  var totalFemaleEighteen19 = 0
+
+  // Ages 20 - 44
+  var totalMaleTwenty = 0
+  var totalMaleTwentyOne = 0
+  var totalMaleTwentyTwo24 = 0
+  var totalMaleTwentyFive29 = 0
+  var totalMaleThirty34 = 0
+  var totalMaleThirtyFive39 = 0
+  var totalMaleForty44 = 0
+  var totalFemaleTwenty = 0
+  var totalFemaleTwentyOne = 0
+  var totalFemaleTwentyTwo24 = 0
+  var totalFemaleTwentyFive29 = 0
+  var totalFemaleThirty34 = 0
+  var totalFemaleThirtyFive39 = 0
+  var totalFemaleForty44 = 0
+
+  // Ages 45 - 64
+  var totalMaleFortyFive49 = 0
+  var totalMaleFifty54 = 0
+  var totalMaleFiftyFive59 = 0
+  var totalMaleSixty61 = 0
+  var totalMaleSixtyTwo64 = 0
+  var totalFemaleFortyFive49 = 0
+  var totalFemaleFifty54 = 0
+  var totalFemaleFiftyFive59 = 0
+  var totalFemaleSixty61 = 0
+  var totalFemaleSixtyTwo64 = 0
+
+  // Ages 65+
+  var totalMaleSixtyFive66 = 0
+  var totalMaleSixtySeven69 = 0
+  var totalMaleSeventy74 = 0
+  var totalMaleSeventyFive79 = 0
+  var totalMaleEighty84 = 0
+  var totalMaleEightyFivePlus = 0
+  var totalFemaleSixtyFive66 = 0
+  var totalFemaleSixtySeven69 = 0
+  var totalFemaleSeventy74 = 0
+  var totalFemaleSeventyFive79 = 0
+  var totalFemaleEighty84 = 0
+  var totalFemaleEightyFivePlus = 0
+
+  filteredArray.map((k) => {
+
+    totalMaleUnder5 += parseInt(k[0]) 
+    totalMaleFive9 += parseInt(k[1])
+    totalMaleTen14 += parseInt(k[2])
+    totalMaleFifteen17 += parseInt(k[3])
+    totalMaleEighteen19 += parseInt(k[4])
+    totalFemaleUnder5 += parseInt(k[5]) 
+    totalFemaleFive9 += parseInt(k[6])
+    totalFemaleTen14 += parseInt(k[7])
+    totalFemaleFifteen17 += parseInt(k[8])
+    totalFemaleEighteen19 += parseInt(k[9])
+
+    totalMaleTwenty += parseInt(k[10])
+    totalMaleTwentyOne += parseInt(k[11])
+    totalMaleTwentyTwo24 += parseInt(k[12])
+    totalMaleTwentyFive29 += parseInt(k[13])
+    totalMaleThirty34 += parseInt(k[14])
+    totalMaleThirtyFive39 += parseInt(k[15])
+    totalMaleForty44 += parseInt(k[16])
+    totalFemaleTwenty += parseInt(k[17])
+    totalFemaleTwentyOne += parseInt(k[18])
+    totalFemaleTwentyTwo24 += parseInt(k[19])
+    totalFemaleTwentyFive29 += parseInt(k[20])
+    totalFemaleThirty34 += parseInt(k[21])
+    totalFemaleThirtyFive39 += parseInt(k[22])
+    totalFemaleForty44 += parseInt(k[23])
+
+    totalMaleFortyFive49 += parseInt(k[24])
+    totalMaleFifty54 += parseInt(k[25])
+    totalMaleFiftyFive59 += parseInt(k[26])
+    totalMaleSixty61 += parseInt(k[27])
+    totalMaleSixtyTwo64 += parseInt(k[28])
+    totalFemaleFortyFive49 += parseInt(k[29])
+    totalFemaleFifty54 += parseInt(k[30])
+    totalFemaleFiftyFive59 += parseInt(k[31])
+    totalFemaleSixty61 += parseInt(k[32])
+    totalFemaleSixtyTwo64 += parseInt(k[33])
+
+    totalMaleSixtyFive66 += parseInt(k[34])
+    totalMaleSixtySeven69 += parseInt(k[35])
+    totalMaleSeventy74 += parseInt(k[36])
+    totalMaleSeventyFive79 += parseInt(k[37])
+    totalMaleEighty84 += parseInt(k[38])
+    totalMaleEightyFivePlus += parseInt(k[39])
+    totalFemaleSixtyFive66 += parseInt(k[40])
+    totalFemaleSixtySeven69 += parseInt(k[41])
+    totalFemaleSeventy74 += parseInt(k[42])
+    totalFemaleSeventyFive79 += parseInt(k[43])
+    totalFemaleEighty84 += parseInt(k[44])
+    totalFemaleEightyFivePlus += parseInt(k[45])
+  })
+
+  var agesZero19 = totalMaleUnder5 + totalMaleFive9 + totalMaleTen14 + totalMaleFifteen17 + totalMaleEighteen19 + totalFemaleUnder5 + totalFemaleFive9 + totalFemaleTen14 + totalFemaleFifteen17 + totalFemaleEighteen19
+  var agesTwenty44 = totalMaleTwenty + totalMaleTwentyOne + totalMaleTwentyTwo24 + totalMaleTwentyFive29 + totalMaleThirty34 + totalMaleThirtyFive39 + totalMaleForty44 + totalFemaleTwenty + totalFemaleTwentyOne + totalFemaleTwentyTwo24 + totalFemaleTwentyFive29 + totalFemaleThirty34 + totalFemaleThirtyFive39 + totalFemaleForty44
+  var agesFortyFive64 = totalMaleFortyFive49 + totalMaleFifty54 + totalMaleFiftyFive59 + totalMaleSixty61 + totalMaleSixtyTwo64 + totalFemaleFortyFive49 + totalFemaleFifty54 + totalFemaleFiftyFive59 + totalFemaleSixty61 + totalFemaleSixtyTwo64
+  var agesSixtyFivePlus = totalMaleSixtyFive66 + totalMaleSixtySeven69 + totalMaleSeventy74 + totalMaleSeventyFive79 + totalMaleEighty84 + totalMaleEightyFivePlus + totalFemaleSixtyFive66 + totalFemaleSixtySeven69 + totalFemaleSeventy74 + totalFemaleSeventyFive79 + totalFemaleEighty84 + totalFemaleEightyFivePlus 
+
+  var censusAgeData = {
+
+    agesZero19: agesZero19,
+    agesTwenty44: agesTwenty44,
+    agesFortyFive64: agesFortyFive64,
+    agesSixtyFivePlus: agesSixtyFivePlus
+  }
+
+  res.send(censusAgeData);
 });
