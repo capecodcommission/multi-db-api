@@ -952,7 +952,7 @@ function calc_MedianRent(rentData) {
 // Locally, this GET request must be run prior to posting to '/api/getCensusAgeTotals' to store the cached data in 'globalCensusAge'.
 // On 'api-app-05', this must be executed once every 30 days.
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusAge
-app.get('/api/cacheCensusAge', function (req, res) {
+app.get('/api/cacheCensusAge', cache('30 days'), function (req, res) {
 
   if (!req.params) {
 
@@ -976,7 +976,7 @@ app.get('/api/cacheCensusAge', function (req, res) {
 // Locally, this GET request must be run prior to posting to '/api/getCensusAffordabilityTotals' to store the cached data in 'globalCensusAffordability'.
 // On 'api-app-05', this must be executed once every 30 days.
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusAffordability
-app.get('/api/cacheCensusAffordability', function (req, res) {
+app.get('/api/cacheCensusAffordability', cache('30 days'), function (req, res) {
 
   if (!req.params) {
 
@@ -1098,7 +1098,7 @@ app.get('/api/cacheCensusIncomeEmploymentEducation', cache('30 days'), function 
 // Locally, this GET request must be run prior to posting to '/api/getCensusEduTractTotals' to store the cached data in 'globalCensusEduTract'.
 // On 'api-app-05', this must be executed once every 30 days.
 // EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusEduTract
-app.get('/api/cacheCensusEduTract', function (req, res) {
+app.get('/api/cacheCensusEduTract', cache('30 days'), function (req, res) {
 
   if (!req.params) {
 
@@ -1119,9 +1119,11 @@ app.get('/api/cacheCensusEduTract', function (req, res) {
   });
 });
 
-// GET Census Towns data from the US Census API where columns are listed after "=" in url string
-// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusTowns
-app.get('/api/cacheCensusEduTown', function (req, res) {
+// Creates a cache of Census Education data at the Town level from the US Census API where columns are listed after "=" in url string.
+// Locally, this GET request must be run prior to posting to '/api/getCensusEduTownTotals' to store the cached data in 'globalCensusEduTown'.
+// On 'api-app-05', this must be executed once every 30 days.
+// EXAMPLE: http://sql-connect.api.capecodcommission.org/api/cacheCensusEduTown
+app.get('/api/cacheCensusEduTown', cache('30 days'), function (req, res) {
 
   if (!req.params) {
 
@@ -1138,6 +1140,14 @@ app.get('/api/cacheCensusEduTown', function (req, res) {
 
       var jsonBody = JSON.parse(body)
 
+      jsonBody.map((i) => {
+
+        // Reduce subdivision string to town name, then uppercase to match with parcel layer town name
+        i[0] = i[0].substr(0,i[0].indexOf(' ')).toUpperCase()
+
+        return i
+      })
+
       globalCensusEduTown = jsonBody
     }
   });
@@ -1147,7 +1157,7 @@ app.get('/api/cacheCensusEduTown', function (req, res) {
 // Locally, this POST request must be run following running '/api/cacheCensusRent' to store the cached data in 'globalCensusAffordability'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusRent', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAffordabilityTotals
-app.post('/api/getCensusAffordabilityTotals', cache('30 days'), function (req, res) {
+app.post('/api/getCensusAffordabilityTotals', function (req, res) {
 
   var filteredArray = globalCensusAffordability.filter((el => {
 
@@ -1235,7 +1245,7 @@ app.post('/api/getCensusAffordabilityTotals', cache('30 days'), function (req, r
 // Locally, this POST request must be run following running '/api/cacheCensusRent' to store the cached data in 'globalCensusRent'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusRent', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHomePriceMedian
-app.post('/api/getCensusRentMedian', cache('30 days'), function (req, res) {
+app.post('/api/getCensusRentMedian', function (req, res) {
 
   var filteredArray = globalCensusRent.filter((el => {
 
@@ -1339,7 +1349,7 @@ app.post('/api/getCensusRentMedian', cache('30 days'), function (req, res) {
 // Locally, this POST request must be run following running '/api/cacheCensusHomePrice' to store the cached data in 'globalCensusHomePrice'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusHomePrice', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHomePriceMedian
-app.post('/api/getCensusHomePriceMedian', cache('30 days'), function (req, res) {
+app.post('/api/getCensusHomePriceMedian', function (req, res) {
 
   var filteredArray = globalCensusHomePrice.filter((el => {
 
@@ -1449,7 +1459,8 @@ app.post('/api/getCensusHomePriceMedian', cache('30 days'), function (req, res) 
 // Locally, this POST request must be run following running '/api/getCensusHousingOccTotals' to store the cached data in 'globalCensusHousingOcc'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusHousingOcc', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
-app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res) {
+app.post('/api/getCensusHousingOccTotals', function (req, res) {
+
   var filteredArray = globalCensusHousingOcc.filter((el => {
 
     return req.body.idArray.includes(el[13] + el[14])
@@ -1502,7 +1513,7 @@ app.post('/api/getCensusHousingOccTotals', cache('30 days'), function (req, res)
 // Locally, this POST request must be run following running '/api/cacheCensusIncomeEmploymentEducation' to store the cached data in 'globalCensusIncomeEmploymentEducation'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusIncomeEmploymentEducation', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
-app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), function (req, res) {
+app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
 
   var filteredArray = globalCensusIncomeEmploymentEducation.filter((el => {
 
@@ -1665,7 +1676,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', cache('30 days'), func
 // Locally, this POST request must be run following running '/api/cacheCensusEduTract' to store the cached data in 'globalCensusEduTract'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusEduTract', which happens every 30 days.
 // POST: {"idArray": ["013100","012900"]} <-- {"idArray": ["TRACT","TRACT"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTractTotals
-app.post('/api/getCensusEduTractTotals', cache('30 days'), function (req, res) {
+app.post('/api/getCensusEduTractTotals', function (req, res) {
 
   var filteredArray = globalCensusEduTract.filter((el => {
 
@@ -1743,15 +1754,15 @@ app.post('/api/getCensusEduTractTotals', cache('30 days'), function (req, res) {
   res.send(censusEduTractData);
 });
 
-// Creates a new data object, 'censusEduTractData', holding Census Education data. This is added to 'globalCenusData'.
-// Locally, this POST request must be run following running '/api/cacheCensusEduTract' to store the cached data in 'globalCensusEduTract'.
-// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusEduTract', which happens every 30 days.
-// POST: {"idArray": ["013100","012900"]} <-- {"idArray": ["TRACT","TRACT"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTownTotals
-app.post('/api/getCensusEduTownTotals', cache('30 days'), function (req, res) {
+// Creates a new data object, 'censusEduTownData', holding Census Education data. This is added to 'globalCenusData'.
+// Locally, this POST request must be run following running '/api/cacheCensusEduTown' to store the cached data in 'globalCensusEduTown'.
+// On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusEduTown', which happens every 30 days.
+// POST: {"idArray": ["BARNSTABLE","HYANNIS"} <-- {"idArray": ["TOWNNAME","TOWNNAME"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTownTotals
+app.post('/api/getCensusEduTownTotals', function (req, res) {
 
   var filteredArray = globalCensusEduTown.filter((el => {
 
-    return req.body.idArray.includes(el[7])
+    return req.body.idArray.includes(el[0])
   }))
 
   var totalLessHSG = 0
@@ -1759,15 +1770,59 @@ app.post('/api/getCensusEduTownTotals', cache('30 days'), function (req, res) {
   var totalSCA = 0
   var totalBac = 0
   var totalGrad = 0
+  var totalIncLength = 0
 
   filteredArray.map((k) => {
 
-    totalLessHSG += parseInt(k[0])
-    totalHSG += parseInt(k[1]) // Append/fill census attributes by column index
-    totalSCA += parseInt(k[2])
-    totalBac += parseInt(k[3])
-    totalGrad += parseInt(k[4])
+    totalIncLength++
+
+    // Replace negative values with 1
+    if (parseInt(k[1]) < 0) {
+
+      totalLessHSG += 1
+    } else {
+
+      totalLessHSG += parseInt(k[1])
+    }
+
+    if (parseInt(k[2]) < 0) {
+
+      totalHSG += 1
+    } else {
+
+      totalHSG += parseInt(k[2])
+    }
+
+    if (parseInt(k[3]) < 0) {
+
+      totalSCA += 1
+    } else {
+
+      totalSCA += parseInt(k[3])
+    }
+
+    if (parseInt(k[4]) < 0) {
+
+      totalBac += 1
+    } else {
+
+      totalBac += parseInt(k[4])
+    }
+
+    if (parseInt(k[5]) < 0) {
+
+      totalGrad += 1
+    } else {
+
+      totalGrad += parseInt(k[5])
+    }
   })
+
+  totalLessHSG = totalLessHSG / totalIncLength
+  totalHSG = totalHSG / totalIncLength
+  totalSCA = totalSCA / totalIncLength
+  totalBac = totalBac / totalIncLength
+  totalGrad = totalGrad / totalIncLength
 
   var censusEduTownData = {
 
@@ -1785,7 +1840,7 @@ app.post('/api/getCensusEduTownTotals', cache('30 days'), function (req, res) {
 // Locally, this POST request must be run following running '/api/cacheCensusAge' to store the cached data in 'globalCensusAge'.
 // On 'api-app-05', this can only be executed following the execution of '/api/cacheCensusAge', which happens every 30 days.
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAgeTotals
-app.post('/api/getCensusAgeTotals', cache('30 days'), function (req, res) {
+app.post('/api/getCensusAgeTotals', function (req, res) {
 
   var filteredArray = globalCensusAge.filter((el => {
 
