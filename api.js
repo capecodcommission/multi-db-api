@@ -1161,7 +1161,7 @@ app.post('/api/getCensusAffordabilityTotals', function (req, res) {
 
   var filteredArray = globalCensusAffordability.filter((el => {
 
-    return req.body.idArray.includes(el[23] + el[24])
+    return req.body.includes(el[23] + el[24])
   }))
 
   // Poverty
@@ -1249,7 +1249,7 @@ app.post('/api/getCensusRentMedian', function (req, res) {
 
   var filteredArray = globalCensusRent.filter((el => {
 
-    return req.body.idArray.includes(el[26] + el[27])
+    return req.body.includes(el[26] + el[27])
   }))
 
   // Init rental data totals
@@ -1353,7 +1353,7 @@ app.post('/api/getCensusHomePriceMedian', function (req, res) {
 
   var filteredArray = globalCensusHomePrice.filter((el => {
 
-    return req.body.idArray.includes(el[28] + el[29])
+    return req.body.includes(el[28] + el[29])
   }))
 
   // Home Price
@@ -1463,7 +1463,7 @@ app.post('/api/getCensusHousingOccTotals', function (req, res) {
 
   var filteredArray = globalCensusHousingOcc.filter((el => {
 
-    return req.body.idArray.includes(el[13] + el[14])
+    return req.body.includes(el[13] + el[14])
   }))
 
   var totalHousing = 0 // US Census column ABC###
@@ -1517,7 +1517,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
 
   var filteredArray = globalCensusIncomeEmploymentEducation.filter((el => {
 
-    return req.body.idArray.includes(el[52] + el[53])
+    return req.body.includes(el[52] + el[53])
   }))
 
   // Income
@@ -1621,11 +1621,11 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
     totalDoc += parseInt(k[44])
   })
 
-  var totalHSG = (totalHS + totalGED) / totalEdu
-  var totalSCA = (totalSCLess1 + totalSCMore1 + totalAss) / totalEdu
-  var totalGradPro = (totalMas + totalPro + totalDoc) / totalEdu
-  var totalLessHS = (totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12) / totalEdu
-  totalBac = totalBac / totalEdu
+  var totalHSG = totalHS + totalGED 
+  var totalSCA = totalSCLess1 + totalSCMore1 + totalAss
+  var totalGradPro = totalMas + totalPro + totalDoc
+  var totalLessHS = totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12 
+  totalBac = totalBac
 
   var percUnemp = totalUnemp / totalCivilLabor
 
@@ -1680,7 +1680,7 @@ app.post('/api/getCensusEduTractTotals', function (req, res) {
 
   var filteredArray = globalCensusEduTract.filter((el => {
 
-    return req.body.idArray.includes(el[7])
+    return req.body.includes(el[7])
   }))
 
   var totalLessHSG = 0
@@ -1762,7 +1762,7 @@ app.post('/api/getCensusEduTownTotals', function (req, res) {
 
   var filteredArray = globalCensusEduTown.filter((el => {
 
-    return req.body.idArray.includes(el[0])
+    return req.body.includes(el[0])
   }))
 
   var totalLessHSG = 0
@@ -1844,7 +1844,7 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
 
   var filteredArray = globalCensusAge.filter((el => {
 
-    return req.body.idArray.includes(el[48] + el[49])
+    return req.body.includes(el[48] + el[49])
   }))
 
   // Ages 0 - 19
