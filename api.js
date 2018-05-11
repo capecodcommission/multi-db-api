@@ -39,6 +39,8 @@ var wmvp3_DBConfig = {
   port: '65335',
   database: 'wMVP3_CapeCodMA',
   stream: true,
+  requestTimeout: 300000,
+  connectionTimeout: 300000,
   pool: {
     max: 100,
     min: 0,
@@ -53,6 +55,8 @@ var wqm_DBConfig = {
   port: '65335',
   database: 'WaterQualityMonitoring',
   stream: true,
+  requestTimeout: 300000,
+  connectionTimeout: 300000,
   pool: {
     max: 100,
     min: 0,
@@ -67,6 +71,8 @@ var tm_DBConfig = {
   port: '65335',
   database: 'Tech_Matrix',
   stream: true,
+  requestTimeout: 300000,
+  connectionTimeout: 300000,
   pool: {
     max: 100,
     min: 0,
@@ -81,6 +87,8 @@ var comchar_DBConfig = {
   port: '65335',
   database: 'CommunityCharacteristics',
   stream: true,
+  requestTimeout: 300000,
+  connectionTimeout: 300000,
   pool: {
     max: 100,
     min: 0,
@@ -1159,10 +1167,10 @@ app.get('/api/cacheCensusEduTown', cache('30 days'), function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAffordabilityTotals
 app.post('/api/getCensusAffordabilityTotals', function (req, res) {
 
-  var filteredArray = globalCensusAffordability.filter((el => {
+  var filteredArray = globalCensusAffordability.filter((el) => {
 
     return req.body.includes(el[23] + el[24])
-  }))
+  })
 
   // Poverty
   var totalHouseholdsBelowPoverty = 0 // US Census column ABC###
@@ -1247,10 +1255,10 @@ app.post('/api/getCensusAffordabilityTotals', function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHomePriceMedian
 app.post('/api/getCensusRentMedian', function (req, res) {
 
-  var filteredArray = globalCensusRent.filter((el => {
+  var filteredArray = globalCensusRent.filter((el) => {
 
     return req.body.includes(el[26] + el[27])
-  }))
+  })
 
   // Init rental data totals
   var totalRentLess100 = 0
@@ -1351,10 +1359,10 @@ app.post('/api/getCensusRentMedian', function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHomePriceMedian
 app.post('/api/getCensusHomePriceMedian', function (req, res) {
 
-  var filteredArray = globalCensusHomePrice.filter((el => {
+  var filteredArray = globalCensusHomePrice.filter((el) => {
 
     return req.body.includes(el[28] + el[29])
-  }))
+  })
 
   // Home Price
   var totalHomeLess10k = 0
@@ -1461,10 +1469,10 @@ app.post('/api/getCensusHomePriceMedian', function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
 app.post('/api/getCensusHousingOccTotals', function (req, res) {
 
-  var filteredArray = globalCensusHousingOcc.filter((el => {
+  var filteredArray = globalCensusHousingOcc.filter((el) => {
 
     return req.body.includes(el[13] + el[14])
-  }))
+  })
 
   var totalHousing = 0 // US Census column ABC###
   var totalSeasonal = 0
@@ -1515,10 +1523,10 @@ app.post('/api/getCensusHousingOccTotals', function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusHousingOccTotals
 app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
 
-  var filteredArray = globalCensusIncomeEmploymentEducation.filter((el => {
+  var filteredArray = globalCensusIncomeEmploymentEducation.filter((el) => {
 
     return req.body.includes(el[52] + el[53])
-  }))
+  })
 
   // Income
   var totalLess10k = 0;  // US Census column ABC###
@@ -1678,10 +1686,10 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
 // POST: {"idArray": ["013100","012900"]} <-- {"idArray": ["TRACT","TRACT"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTractTotals
 app.post('/api/getCensusEduTractTotals', function (req, res) {
 
-  var filteredArray = globalCensusEduTract.filter((el => {
+  var filteredArray = globalCensusEduTract.filter((el) => {
 
     return req.body.includes(el[7])
-  }))
+  })
 
   var totalLessHSG = 0
   var totalHSG = 0
@@ -1760,10 +1768,10 @@ app.post('/api/getCensusEduTractTotals', function (req, res) {
 // POST: {"idArray": ["BARNSTABLE","HYANNIS"} <-- {"idArray": ["TOWNNAME","TOWNNAME"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusEduTownTotals
 app.post('/api/getCensusEduTownTotals', function (req, res) {
 
-  var filteredArray = globalCensusEduTown.filter((el => {
+  var filteredArray = globalCensusEduTown.filter((el) => {
 
     return req.body.includes(el[0])
-  }))
+  })
 
   var totalLessHSG = 0
   var totalHSG = 0
@@ -1842,10 +1850,10 @@ app.post('/api/getCensusEduTownTotals', function (req, res) {
 // POST: {"idArray": ["0131001","0129001"]} <-- {"idArray": ["TRACT+BLKGRP","TRACT+BLKGRP"]} | EXAMPLE: http://sql-connect.api.capecodcommission.org/api/getCensusAgeTotals
 app.post('/api/getCensusAgeTotals', function (req, res) {
 
-  var filteredArray = globalCensusAge.filter((el => {
+  var filteredArray = globalCensusAge.filter((el) => {
 
     return req.body.includes(el[48] + el[49])
-  }))
+  })
 
   // Ages 0 - 19
   var totalMaleUnder5 = 0 
