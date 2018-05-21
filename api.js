@@ -96,48 +96,40 @@ var comchar_DBConfig = {
   }
 };
 
+var comCharConnect = new sql.ConnectionPool(comchar_DBConfig)
+var wmvp3Connect = new sql.ConnectionPool(wmvp3_DBConfig)
+var tmConnect = new sql.ConnectionPool(tm_DBConfig)
+var wqmConnect = new sql.ConnectionPool(wqm_DBConfig)
+
+comCharConnect.connect(err => {
+
+  console.log(err)
+})
+
+wmvp3Connect.connect(err => {
+
+  console.log(err)
+})
+
+tmConnect.connect(err => {
+
+  console.log(err)
+})
+
+wqmConnect.connect(err => {
+
+  console.log(err)
+})
+
+
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
-var  executeQuery = function (res, query, config) {
+var  executeQuery = function (res, query, connection) {
 
-  // Must close open sql connection first before opening a new one
-  sql.close()
+  var request = new sql.Request(connection)
+  
+  request.query(query).then(response => {
 
-  // use mssql node package to connect to the 'wMVP3_CapeCodMA' db
-  sql.connect(config, function (err) {
-
-    // if there's an error connecting to the db, console.log it out
-    if (err) {
-
-      console.log("Error while connecting database :- " + err);
-      res.send(err);
-    }
-
-    // if there's no error, create the Request object & query the db
-    else {
-
-      // indicate connection to the 'wMVP3_CapeCodMA' database
-      console.log('we are connected');
-
-      // create Request object
-      var request = new sql.Request();
-
-      // query the database
-      request.query(query, function (err, recordset) {
-
-        // if there's an error in the query, console.log it out
-        if (err) {
-
-          console.log('Error while querying database :- ' + err);
-          res.send(err);
-        }
-
-        // if there's no error, send the response
-        else {
-
-          res.send(recordset);
-        }
-      })
-    }
+    res.send(response)
   })
 }
 
@@ -149,7 +141,7 @@ app.get('/api/ScenarioWiz/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET TreatmentWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
@@ -158,7 +150,7 @@ app.get('/api/TreatmentWiz/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.Treatment_Wiz where ScenarioID = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET Embayments table from 'wMVP3_CapeCodMA' DB
@@ -167,7 +159,7 @@ app.get('/api/Embayments', function(req , res) {
 
   var query = 'select * from CapeCodMA.Embayments';
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET FTCoeff table from 'wMVP3_CapeCodMA' DB
@@ -176,7 +168,7 @@ app.get('/api/FTCoeff', function(req , res) {
 
   var query = 'select * from CapeCodMA.FTCoeff';
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET MATowns from 'wMVP3_CapeCodMA' DB
@@ -185,7 +177,7 @@ app.get('/api/MATowns', function(req , res) {
 
   var query = 'select * from CapeCodMA.MATowns';
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET SubEmbayments from 'wMVP3_CapeCodMA' DB
@@ -194,7 +186,7 @@ app.get('/api/SubEmbayments', function(req , res) {
 
   var query = 'select * from CapeCodMA.SubEmbayments';
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET Subwatersheds from 'wMVP3_CapeCodMA' DB
@@ -203,7 +195,7 @@ app.get('/api/Subwatersheds', function(req , res) {
 
   var query = 'select * from CapeCodMA.Subwatersheds';
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET parcelMaster data from 'wMVP3_CapeCodMA' DB where scenario id = ##
@@ -212,7 +204,7 @@ app.get('/api/parcelMaster/:id', function(req , res) {
 
   var query = 'select * from CapeCodMA.parcelMaster WHERE scenario_id = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET wiz_treatment_towns data from 'wMVP3_CapeCodMA' DB where scenario id = ##
@@ -221,7 +213,7 @@ app.get('/api/wiz_treatment_towns/:id', function(req , res) {
 
   var query = 'select * from dbo.wiz_treatment_towns WHERE wtt_scenario_id = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 
@@ -231,7 +223,7 @@ app.get('/api/WastewaterSource3/:id', function(req , res) {
 
   var query = 'select * from dbo.WastewaterSource3 WHERE Muni_ID = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //GET ParcelCharacteristics data from 'wMVP3_CapeCodMA' DB where municipal id = ##
@@ -240,7 +232,7 @@ app.get('/api/ParcelCharacteristics/:id', function(req , res) {
 
   var query = 'select * from dbo.ParcelCharacteristics WHERE Muni_ID = ' + req.params.id;
 
-  executeQuery (res, query, wmvp3_DBConfig);
+  executeQuery (res, query, wmvp3Connect);
 });
 
 //******************************---WaterQualityMonitoring DATABASE CALLS---******************************
@@ -266,7 +258,7 @@ app.get("/api/getEmbayment/:name", function(req , res) {
                FROM dbo.WaterQualityReading \
                WHERE Uid = " + "'" + req.params.name + "'" + 'ORDER BY cast(DATE as date)';
 
-  executeQuery (res, query, wqm_DBConfig);
+  executeQuery (res, query, wqmConnect);
 });
 
 
@@ -302,7 +294,7 @@ app.get("/api/getStation/:name", function(req , res) {
               OR a.orthophosphate IS NOT NULL \
               OR a.chlorophyll IS NOT NULL \
               OR a.phaeophytin IS NOT NULL'
-  executeQuery (res, query, wqm_DBConfig);
+  executeQuery (res, query, wqmConnect);
 });
 
 //GET Station names from WaterQualityReading where Name (Embayment Name) = NAME
@@ -318,7 +310,7 @@ app.get("/api/getStations/:name", function(req , res) {
                   on s.Name = r.Uid \
                 where r.Uid is not null and e.Name = " + "'" + req.params.name + "'"
 
-  executeQuery (res, query, wqm_DBConfig);
+  executeQuery (res, query, wqmConnect);
 });
 
 //GET Embayment data from 'WaterQualityMonitoring' where embayment id is not null & embayment is in Barnstable County (Cape Cod)
@@ -327,7 +319,7 @@ app.get('/api/getEmbayments', function(req , res) {
 
   var query = 'select id as EMBAYMENT_ID, Name as EMBAYMENT from dbo.Embayment where id is not null and id < 160'
 
-  executeQuery (res, query, wqm_DBConfig);
+  executeQuery (res, query, wqmConnect);
 });
 
 //******************************---CommunityCharacteristics DATABASE CALLS---******************************
@@ -338,7 +330,7 @@ app.get('/api/getNeighborhoods', function(req , res) {
 
   var query = "select distinct Neighborhood from dbo.commchar_0815 where Neighborhood != ''"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 //GET Activity Center Name data from 'commchar_0815' table in 'CommunityCharacteristics' DB
@@ -347,7 +339,7 @@ app.get('/api/getActivityCenters', function(req , res) {
 
   var query = "select distinct AC_FINAL as center from dbo.commchar_0815 where AC_FINAL != ''"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 //GET Town Name data from 'commchar_0815' table in 'CommunityCharacteristics' DB
@@ -356,7 +348,7 @@ app.get('/api/getTowns', function(req , res) {
 
   var query = "select distinct Town as town from dbo.commchar_0815 where Town != ''"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 //GET Selected Geography Score data from 'commchar_0815' table in 'CommunityCharacteristics' DB
@@ -414,7 +406,7 @@ app.get('/api/getACScores/:type', function(req , res) {
               GROUP BY Town"
   }
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 //GET d3 Chart data from by Selected Geograhy Name and Type from 'commchar_0815' table in 'CommunityCharacteristics' DB
@@ -470,7 +462,7 @@ app.get('/api/getd3Data/:type/:name', function(req , res) {
               WHERE Town = " + "'" + name + "'" + " GROUP BY Town"
   }
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 
@@ -494,7 +486,7 @@ app.post('/api/getParcelSums/', function(req , res) {
 
   var query = 'exec getParcelSums ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE getParcelSums1MI stored proc to retrieve parcel summations within 1MI of selection
@@ -517,7 +509,7 @@ app.post('/api/getParcelSums1MI/', function(req , res) {
 
   var query = 'exec getParcelSums1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE getParcelSumsROT stored proc to retrieve parcel summations within town and outside selection
@@ -540,7 +532,7 @@ app.post('/api/getParcelSumsROT/', function(req , res) {
 
   var query = 'exec getParcelSumsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectBlockGroups stored proc to retrieve intersecting block groups given intersecting parcel populations
@@ -563,7 +555,7 @@ app.post('/api/selectBlockGroups/', function(req , res) {
 
   var query = 'exec selectBlockGroups ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectBlockGroups1MI stored proc to retrieve intersecting block groups given intersecting parcel populations within 1MI
@@ -586,7 +578,7 @@ app.post('/api/selectBlockGroups1MI/', function(req , res) {
 
   var query = 'exec selectBlockGroups1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectBlockGroupsROT stored proc to retrieve block groups within the remainder of a town but outside of 1mi from the selection
@@ -609,7 +601,7 @@ app.post('/api/selectBlockGroupsROT/', function(req , res) {
 
   var query = 'exec selectBlockGroupsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectTracts stored proc to retrieve tract ids intersecting with the selection
@@ -632,7 +624,7 @@ app.post('/api/selectTracts/', function(req , res) {
 
   var query = 'exec selectTracts ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectTracts1MI stored proc to retrieve tract ids intersecting parcel populations within 1MI
@@ -655,7 +647,7 @@ app.post('/api/selectTracts1MI/', function(req , res) {
 
   var query = 'exec selectTracts1MI ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 // EXECUTE selectTractsROT stored proc to retrieve tracts within the remainder of a town but outside of 1mi from the selection
@@ -678,7 +670,7 @@ app.post('/api/selectTractsROT/', function(req , res) {
 
   var query = 'exec selectTractsROT ' + "'" + req.body.town + "', " + "'" + req.body.rings + "'"
 
-  executeQuery (res, query, comchar_DBConfig);
+  executeQuery (res, query, comCharConnect);
 });
 
 
@@ -690,7 +682,7 @@ app.get('/api/Technology_Matrix/:id', function(req , res) {
 
   var query = 'select * from dbo.Technology_Matrix WHERE TM_ID = ' + req.params.id;
 
-  executeQuery (res, query, tm_DBConfig);
+  executeQuery (res, query, tmConnect);
 });
 
 //******************************---US Census API CALLS---******************************
