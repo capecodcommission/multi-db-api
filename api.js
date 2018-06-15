@@ -1985,15 +1985,9 @@ app.get('/api/getScenarioWizData/:id', function(req , res) {
 
       getFTCoeffData(subemKey).then((ftResponse) => {
 
-        console.log(ftResponse)
+        console.log(ftResponse.recordset)
       })
     })
-
-  // console.log(scenarioWizData)
-
-  // var query = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + req.params.id;
-
-  // executeQuery (res, query, wmvp3Connect);
 });
 
 // GET row from scenario wiz table by scenario id, pass request but not response
@@ -2009,7 +2003,7 @@ var getScenarioWizData = function(id) {
 var getFTCoeffData = function(id) {
 
   var ftCoeffRequest = new sql.Request(wmvp3Connect)
-  var ftCoeffQuery = "select SUBWATER_ID from CapeCodMA.FTCoeff where SUBEM_ID = " + id
+  var ftCoeffQuery = "select SUBWATER_ID from CapeCodMA.FTCoeff where EMBAY_ID = " + id
   
   return ftCoeffRequest.query(ftCoeffQuery)
 }
