@@ -102,23 +102,27 @@ var tmConnect = new sql.ConnectionPool(tm_DBConfig)
 var wqmConnect = new sql.ConnectionPool(wqm_DBConfig)
 
 comCharConnect.connect(err => {
-
-  console.log(err)
+  if (err) {
+    console.log("comCharConnect error -->", err)
+  }
 })
 
 wmvp3Connect.connect(err => {
-
-  console.log(err)
+  if (err) {
+    console.log("wmvp3Connect error -->", err)
+  }
 })
 
 tmConnect.connect(err => {
-
-  console.log(err)
+  if (err) {
+    console.log("tmConnect error -->", err)
+  }
 })
 
 wqmConnect.connect(err => {
-
-  console.log(err)
+  if (err) {
+    console.log("wqmConnect error -->", err)
+  }
 })
 
 
@@ -126,7 +130,7 @@ wqmConnect.connect(err => {
 var  executeQuery = function (res, query, connection) {
 
   var request = new sql.Request(connection)
-  
+
   request.query(query).then(response => {
 
     res.send(response)
@@ -711,7 +715,7 @@ function calc_MedianIncome(incomeData) {
   var lowerBin = 0
   var lowerSum = 0
   var upperBin = 0
-  var upperSum = 0 
+  var upperSum = 0
   var lowerPerc = 0
   var upperPerc = 0
   var lowerIncome = 0
@@ -727,12 +731,12 @@ function calc_MedianIncome(incomeData) {
     var bin = incomeData.slice(1,i) // Subset array starting from smallest income bin to ith element
     var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
     var halfTotal = total / 2.0
-    
+
     // If the summed subset array is greater than half the sample population
     if (binSum > halfTotal) {
 
       lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
+      upperBucket = i - 1
 
       if (i == 16) { // Break loop if at final income bin
 
@@ -746,7 +750,7 @@ function calc_MedianIncome(incomeData) {
         upperBin = incomeData.slice(1,upperBucket+1)
         upperSum = upperBin.reduce((a,b) => {return a + b})
 
-        lowerPerc = lowerSum / total 
+        lowerPerc = lowerSum / total
         upperPerc = upperSum / total
 
         lowerIncome = bucketTops[lowerBucket - 1]
@@ -794,7 +798,7 @@ function calc_MedianHomePrice(priceData) {
   var lowerBin = 0
   var lowerSum = 0
   var upperBin = 0
-  var upperSum = 0 
+  var upperSum = 0
   var lowerPerc = 0
   var upperPerc = 0
   var lowerIncome = 0
@@ -810,12 +814,12 @@ function calc_MedianHomePrice(priceData) {
     var bin = priceData.slice(1,i) // Subset array starting from smallest price bin to ith element
     var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
     var halfTotal = total / 2.0
-    
+
     // If the summed subset array is greater than half the sample population
     if (binSum > halfTotal) {
 
       lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
+      upperBucket = i - 1
 
       if (i == 25) { // Break loop if at final income bin
 
@@ -829,7 +833,7 @@ function calc_MedianHomePrice(priceData) {
         upperBin = priceData.slice(1,upperBucket+1)
         upperSum = upperBin.reduce((a,b) => {return a + b})
 
-        lowerPerc = lowerSum / total 
+        lowerPerc = lowerSum / total
         upperPerc = upperSum / total
 
         lowerIncome = bucketTops[lowerBucket - 1]
@@ -877,7 +881,7 @@ function calc_MedianRent(rentData) {
   var lowerBin = 0
   var lowerSum = 0
   var upperBin = 0
-  var upperSum = 0 
+  var upperSum = 0
   var lowerPerc = 0
   var upperPerc = 0
   var lowerIncome = 0
@@ -893,12 +897,12 @@ function calc_MedianRent(rentData) {
     var bin = rentData.slice(1,i) // Subset array starting from smallest rental bin to ith element
     var binSum = bin.reduce((a,b) => {return a + b}) // Sum subset array
     var halfTotal = total / 2.0
-    
+
     // If the summed subset array is greater than half the sample population
     if (binSum > halfTotal) {
 
       lowerBucket = i - 2 // Set lower/upper bucket bounds
-      upperBucket = i - 1 
+      upperBucket = i - 1
 
       if (i == 23) { // Break loop if at final rental bin
 
@@ -912,7 +916,7 @@ function calc_MedianRent(rentData) {
         upperBin = rentData.slice(1,upperBucket+1)
         upperSum = upperBin.reduce((a,b) => {return a + b})
 
-        lowerPerc = lowerSum / total 
+        lowerPerc = lowerSum / total
         upperPerc = upperSum / total
 
         lowerIncome = bucketTops[lowerBucket - 1]
@@ -1420,29 +1424,29 @@ app.post('/api/getCensusHomePriceMedian', function (req, res) {
     totalHomeLess10k,
     totalHomeTen14,
     totalHomeFif19,
-    totalHomeTwenty24, 
+    totalHomeTwenty24,
     totalHomeTwentyFive29,
-    totalHomeThirty34, 
+    totalHomeThirty34,
     totalHomeThirtyFive39,
-    totalHomeFourty49, 
-    totalHomeFifty59, 
-    totalHomeSixty69, 
-    totalHomeSeventy79, 
-    totalHomeEighty89, 
-    totalHomeNinety99, 
-    totalHomeHundred124, 
-    totalHomeHundredTwentyFive149, 
-    totalHomeHundredFifty175, 
-    totalHomeHundredSeventyFive200, 
-    totalHomeTwoHundred250, 
-    totalHomeTwoFifty299, 
-    totalHomeThreeHundred399, 
-    totalHomeFourHundred499, 
-    totalHomeFiveHundred749, 
+    totalHomeFourty49,
+    totalHomeFifty59,
+    totalHomeSixty69,
+    totalHomeSeventy79,
+    totalHomeEighty89,
+    totalHomeNinety99,
+    totalHomeHundred124,
+    totalHomeHundredTwentyFive149,
+    totalHomeHundredFifty175,
+    totalHomeHundredSeventyFive200,
+    totalHomeTwoHundred250,
+    totalHomeTwoFifty299,
+    totalHomeThreeHundred399,
+    totalHomeFourHundred499,
+    totalHomeFiveHundred749,
     totalHomeSevenFifty999,
-    totalHomeMil14, 
-    totalHomeMilHalf19, 
-    totalHomeTwoMil 
+    totalHomeMil14,
+    totalHomeMilHalf19,
+    totalHomeTwoMil
   ]
 
   var paretoMedian = calc_MedianHomePrice(totalsArr)
@@ -1621,10 +1625,10 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
     totalDoc += parseInt(k[44])
   })
 
-  var totalHSG = totalHS + totalGED 
+  var totalHSG = totalHS + totalGED
   var totalSCA = totalSCLess1 + totalSCMore1 + totalAss
   var totalGradPro = totalMas + totalPro + totalDoc
-  var totalLessHS = totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12 
+  var totalLessHS = totalNoSchool + totalNursery + totalKindergarten + totalG1 + totalG2 + totalG3 + totalG4 + totalG5 + totalG6 + totalG7 + totalG8 + totalG9 + totalG10 + totalG11 + totalG12
   totalBac = totalBac
 
   var percUnemp = totalUnemp / totalCivilLabor
@@ -1664,7 +1668,7 @@ app.post('/api/getCensusIncomeEmploymentEducationTotals', function (req, res) {
     bac: totalBac,
     gradPro: totalGradPro,
     totalEdu: totalEdu,
-    paretoMedian: paretoMedian   
+    paretoMedian: paretoMedian
   }
 
   res.send(censusIncomeEmploymentEducation)
@@ -1848,12 +1852,12 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
   })
 
   // Ages 0 - 19
-  var totalMaleUnder5 = 0 
+  var totalMaleUnder5 = 0
   var totalMaleFive9 = 0
   var totalMaleTen14 = 0
   var totalMaleFifteen17 = 0
   var totalMaleEighteen19 = 0
-  var totalFemaleUnder5 = 0 
+  var totalFemaleUnder5 = 0
   var totalFemaleFive9 = 0
   var totalFemaleTen14 = 0
   var totalFemaleFifteen17 = 0
@@ -1903,12 +1907,12 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
 
   filteredArray.map((k) => {
 
-    totalMaleUnder5 += parseInt(k[0]) 
+    totalMaleUnder5 += parseInt(k[0])
     totalMaleFive9 += parseInt(k[1])
     totalMaleTen14 += parseInt(k[2])
     totalMaleFifteen17 += parseInt(k[3])
     totalMaleEighteen19 += parseInt(k[4])
-    totalFemaleUnder5 += parseInt(k[5]) 
+    totalFemaleUnder5 += parseInt(k[5])
     totalFemaleFive9 += parseInt(k[6])
     totalFemaleTen14 += parseInt(k[7])
     totalFemaleFifteen17 += parseInt(k[8])
@@ -1957,7 +1961,7 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
   var agesZero19 = totalMaleUnder5 + totalMaleFive9 + totalMaleTen14 + totalMaleFifteen17 + totalMaleEighteen19 + totalFemaleUnder5 + totalFemaleFive9 + totalFemaleTen14 + totalFemaleFifteen17 + totalFemaleEighteen19
   var agesTwenty44 = totalMaleTwenty + totalMaleTwentyOne + totalMaleTwentyTwo24 + totalMaleTwentyFive29 + totalMaleThirty34 + totalMaleThirtyFive39 + totalMaleForty44 + totalFemaleTwenty + totalFemaleTwentyOne + totalFemaleTwentyTwo24 + totalFemaleTwentyFive29 + totalFemaleThirty34 + totalFemaleThirtyFive39 + totalFemaleForty44
   var agesFortyFive64 = totalMaleFortyFive49 + totalMaleFifty54 + totalMaleFiftyFive59 + totalMaleSixty61 + totalMaleSixtyTwo64 + totalFemaleFortyFive49 + totalFemaleFifty54 + totalFemaleFiftyFive59 + totalFemaleSixty61 + totalFemaleSixtyTwo64
-  var agesSixtyFivePlus = totalMaleSixtyFive66 + totalMaleSixtySeven69 + totalMaleSeventy74 + totalMaleSeventyFive79 + totalMaleEighty84 + totalMaleEightyFivePlus + totalFemaleSixtyFive66 + totalFemaleSixtySeven69 + totalFemaleSeventy74 + totalFemaleSeventyFive79 + totalFemaleEighty84 + totalFemaleEightyFivePlus 
+  var agesSixtyFivePlus = totalMaleSixtyFive66 + totalMaleSixtySeven69 + totalMaleSeventy74 + totalMaleSeventyFive79 + totalMaleEighty84 + totalMaleEightyFivePlus + totalFemaleSixtyFive66 + totalFemaleSixtySeven69 + totalFemaleSeventy74 + totalFemaleSeventyFive79 + totalFemaleEighty84 + totalFemaleEightyFivePlus
 
   var censusAgeData = {
 
@@ -1973,12 +1977,12 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
 
 //******************************---SAM API---******************************
 
-//GET ScenarioWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
-//EXAMPLE: SCENARIO ID 2727 | http://sql-connect.api.capecodcommission.org/api/ScenarioWiz/2727
+// GET ScenarioWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
+// EXAMPLE: SCENARIO ID 2727 | http://sql-connect.api.capecodcommission.org/api/ScenarioWiz/2727
 app.get('/api/getScenarioWizData/:id', function(req , res) {
 
   getScenarioWizData(req.params.id).then((scenarioResponse) => {
-      
+
     // AreaID in ScenarioWiz seems to be the EMBAY_ID in FTCoeff
     // Although, in SAMMonica.php, the FTCoeff query is filtering on SUBEM_ID instead of EMBAY_ID
       var subemKey = scenarioResponse.recordset[0].AreaID
@@ -1995,7 +1999,7 @@ var getScenarioWizData = function(id) {
 
   var scenarioWizRequest = new sql.Request(wmvp3Connect)
   var scenarioWizQuery = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + id
-  
+
   return scenarioWizRequest.query(scenarioWizQuery)
 }
 
@@ -2004,6 +2008,6 @@ var getFTCoeffData = function(id) {
 
   var ftCoeffRequest = new sql.Request(wmvp3Connect)
   var ftCoeffQuery = "select SUBWATER_ID from CapeCodMA.FTCoeff where EMBAY_ID = " + id
-  
+
   return ftCoeffRequest.query(ftCoeffQuery)
 }
