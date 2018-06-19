@@ -1977,37 +1977,40 @@ app.post('/api/getCensusAgeTotals', function (req, res) {
 
 //******************************---SAM API---******************************
 
+// SAM API progress in this context has been discontinued, and will continue within GraphQL
+
+
 // GET ScenarioWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
 // EXAMPLE: SCENARIO ID 2727 | http://sql-connect.api.capecodcommission.org/api/ScenarioWiz/2727
-app.get('/api/getScenarioWizData/:id', function(req , res) {
+// app.get('/api/getScenarioWizData/:id', function(req , res) {
 
-  getScenarioWizData(req.params.id).then((scenarioResponse) => {
+//   getScenarioWizData(req.params.id).then((scenarioResponse) => {
 
-    // AreaID in ScenarioWiz seems to be the EMBAY_ID in FTCoeff
-    // Although, in SAMMonica.php, the FTCoeff query is filtering on SUBEM_ID instead of EMBAY_ID
-      var subemKey = scenarioResponse.recordset[0].AreaID
+//     // AreaID in ScenarioWiz seems to be the EMBAY_ID in FTCoeff
+//     // Although, in SAMMonica.php, the FTCoeff query is filtering on SUBEM_ID instead of EMBAY_ID
+//       var subemKey = scenarioResponse.recordset[0].AreaID
 
-      getFTCoeffData(subemKey).then((ftResponse) => {
+//       getFTCoeffData(subemKey).then((ftResponse) => {
 
-        console.log(ftResponse.recordset)
-      })
-    })
-});
+//         console.log(ftResponse.recordset)
+//       })
+//     })
+// });
 
-// GET row from scenario wiz table by scenario id, pass request but not response
-var getScenarioWizData = function(id) {
+// // GET row from scenario wiz table by scenario id, pass request but not response
+// var getScenarioWizData = function(id) {
 
-  var scenarioWizRequest = new sql.Request(wmvp3Connect)
-  var scenarioWizQuery = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + id
+//   var scenarioWizRequest = new sql.Request(wmvp3Connect)
+//   var scenarioWizQuery = 'select * from CapeCodMA.Scenario_Wiz where ScenarioID = ' + id
 
-  return scenarioWizRequest.query(scenarioWizQuery)
-}
+//   return scenarioWizRequest.query(scenarioWizQuery)
+// }
 
-// GET rows from ftcoeff table by subembaymentid, pass request but not response
-var getFTCoeffData = function(id) {
+// // GET rows from ftcoeff table by subembaymentid, pass request but not response
+// var getFTCoeffData = function(id) {
 
-  var ftCoeffRequest = new sql.Request(wmvp3Connect)
-  var ftCoeffQuery = "select SUBWATER_ID from CapeCodMA.FTCoeff where EMBAY_ID = " + id
+//   var ftCoeffRequest = new sql.Request(wmvp3Connect)
+//   var ftCoeffQuery = "select SUBWATER_ID from CapeCodMA.FTCoeff where EMBAY_ID = " + id
 
-  return ftCoeffRequest.query(ftCoeffQuery)
-}
+//   return ftCoeffRequest.query(ftCoeffQuery)
+// }
