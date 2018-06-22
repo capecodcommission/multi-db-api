@@ -1992,7 +1992,22 @@ app.get('/api/getScenarioWizData/:id', function(req , res) {
 
       getFTCoeffData(subemKey).then((ftResponse) => {
 
-        console.log(ftResponse.recordset)
+        // console.log(ftResponse.recordset)
+
+        var sqlListBegin = "("
+        var sqlListEnd = ")"
+
+        ftResponse.recordset.map((i) => {
+
+          // console.log(i.SUBWATER_ID)
+
+          sqlListBegin += "'" + i.SUBWATER_ID + "'" + ","
+        })
+
+        var lastOccurenceOfComma = sqlListBegin.lastIndexOf(',') // Obtain index of first x y coordinates
+        var fullSQLList = sqlListBegin.slice(0,lastOccurenceOfComma) + sqlListEnd // Slice poly string to first coordinate set
+
+        console.log(fullSQLList)
       })
     })
 });
