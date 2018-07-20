@@ -133,6 +133,11 @@ var  executeQuery = function (res, query, connection) {
   })
 }
 
+app.get('/api', function(req , res) {
+
+  res.send('Welcome to Cape Cod Commission SIO-SQL-01-API')
+});
+
 //******************************---wMVP3_CapeCodMA DATABASE CALLS---******************************
 
 //GET ScenarioWiz data from 'wMVP3_CapeCodMA' DB where scenario id = ##
