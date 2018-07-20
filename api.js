@@ -96,30 +96,30 @@ var comchar_DBConfig = {
   }
 };
 
-var comCharConnect = new sql.ConnectionPool(comchar_DBConfig)
-var wmvp3Connect = new sql.ConnectionPool(wmvp3_DBConfig)
-var tmConnect = new sql.ConnectionPool(tm_DBConfig)
-var wqmConnect = new sql.ConnectionPool(wqm_DBConfig)
+// var comCharConnect = new sql.ConnectionPool(comchar_DBConfig)
+// var wmvp3Connect = new sql.ConnectionPool(wmvp3_DBConfig)
+// var tmConnect = new sql.ConnectionPool(tm_DBConfig)
+// var wqmConnect = new sql.ConnectionPool(wqm_DBConfig)
 
-comCharConnect.connect(err => {
+// comCharConnect.connect(err => {
 
-  console.log(err)
-})
+//   console.log(err)
+// })
 
-wmvp3Connect.connect(err => {
+// wmvp3Connect.connect(err => {
 
-  console.log(err)
-})
+//   console.log(err)
+// })
 
-tmConnect.connect(err => {
+// tmConnect.connect(err => {
 
-  console.log(err)
-})
+//   console.log(err)
+// })
 
-wqmConnect.connect(err => {
+// wqmConnect.connect(err => {
 
-  console.log(err)
-})
+//   console.log(err)
+// })
 
 
 // Estbalish a ScenarioWizQuery f(x) to connect to 'wMVP3_CapeCodMA' & get a response
