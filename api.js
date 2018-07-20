@@ -133,7 +133,7 @@ var  executeQuery = function (res, query, connection) {
   })
 }
 
-app.get('/api', function(req , res) {
+app.get('/', function(req , res) {
 
   console.log('server pinged')
 
