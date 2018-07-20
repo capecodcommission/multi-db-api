@@ -135,6 +135,8 @@ var  executeQuery = function (res, query, connection) {
 
 app.get('/api', function(req , res) {
 
+  console.log('server pinged')
+
   res.send('Welcome to Cape Cod Commission SIO-SQL-01-API')
 });
 
