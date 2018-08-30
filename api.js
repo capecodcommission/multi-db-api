@@ -975,6 +975,8 @@ app.get('/api/cacheCensusAge', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusAge = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -999,6 +1001,8 @@ app.get('/api/cacheCensusAffordability', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusAffordability = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1023,6 +1027,8 @@ app.get('/api/cacheCensusRent', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusRent = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1047,6 +1053,8 @@ app.get('/api/cacheCensusHomePrice', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusHomePrice = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1072,6 +1080,8 @@ app.get('/api/cacheCensusHousingOcc', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusHousingOcc = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1097,6 +1107,8 @@ app.get('/api/cacheCensusIncomeEmploymentEducation', cache('30 days'), function 
       var jsonBody = JSON.parse(body)
 
       globalCensusIncomeEmploymentEducation = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1122,6 +1134,8 @@ app.get('/api/cacheCensusEduTract', cache('30 days'), function (req, res) {
       var jsonBody = JSON.parse(body)
 
       globalCensusEduTract = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
@@ -1156,6 +1170,8 @@ app.get('/api/cacheCensusEduTown', cache('30 days'), function (req, res) {
       })
 
       globalCensusEduTown = jsonBody
+
+      res.sendStatus(200)
     }
   });
 });
