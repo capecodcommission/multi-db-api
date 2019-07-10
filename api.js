@@ -32,11 +32,11 @@ var server = app.listen(process.env.PORT || 8081, function () {
 
 // wMVP3_CapeCodMA' DB config object
 var wmvp3_DBConfig = {
-  user: 'DBAccess',
-  password: 'Acce$$DB',
+  user: 'EFWFE#@#$^',
+  password: 'RHRHW$#Y$#',
   // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
-  server: '10.10.1.174',
-  port: '65335',
+  server: 'W$Y$#YERYEY',
+  port: '#####',
   database: 'wMVP3_CapeCodMA',
   stream: true,
   requestTimeout: 300000,
@@ -49,10 +49,10 @@ var wmvp3_DBConfig = {
 };
 
 var wqm_DBConfig = {
-  user: 'DBAccess',
-  password: 'Acce$$DB',
-  server: '10.10.1.174',
-  port: '65335',
+  user: 'SGEWW$GW$Y$@',
+  password: '#$^#Y@$TW$WE',
+  server: '#$Y$Y$TWR$^',
+  port: '#^$Y#$y',
   database: 'WaterQualityMonitoring',
   stream: true,
   requestTimeout: 300000,
@@ -65,10 +65,10 @@ var wqm_DBConfig = {
 };
 
 var tm_DBConfig = {
-  user: 'DBAccess',
-  password: 'Acce$$DB',
-  server: '10.10.1.174',
-  port: '65335',
+  user: '@$&H$IUGWRG',
+  password: '%Y#YE%Y#$Y',
+  server: 'E%U$UEURUT',
+  port: '%E%U%EUEUET',
   database: 'Tech_Matrix',
   stream: true,
   requestTimeout: 300000,
@@ -81,10 +81,10 @@ var tm_DBConfig = {
 };
 
 var comchar_DBConfig = {
-  user: 'ACExecute',
-  password: 'ACEi$theplACE',
-  server: '10.10.1.174',
-  port: '65335',
+  user: '$%E%U$E%H',
+  password: '$%UEU$a5EE',
+  server: '#$Y#$YRYEYREH',
+  port: 'E$^U$JETJET',
   database: 'CommunityCharacteristics',
   stream: true,
   requestTimeout: 300000,
