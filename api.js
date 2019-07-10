@@ -34,7 +34,7 @@ var server = app.listen(process.env.PORT || 8081, function () {
 var wmvp3_DBConfig = {
   user: 'EFWFE#@#$^',
   password: 'RHRHW$#Y$#',
-  // server: '192.138.212.28', //ACESS FROM EXTERNAL TO NETWORK? WHAT TRIVEDI WAS USING?
+  // server: '192.138.212.28', 
   server: 'W$Y$#YERYEY',
   port: '#####',
   database: 'wMVP3_CapeCodMA',
